@@ -77,7 +77,7 @@ ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std
 
 bool ResultSetBinding::fetch(std::vector<esl::database::Field>& fields) {
 	if(fields.size() != getColumns().size()) {
-        throw esl::addStacktrace(std::runtime_error("Called 'fetch' with wrong number of fields. Given " + std::to_string(fields.size()) + " fields, but it should be " + std::to_string(getColumns().size()) + " fields."));
+		throw esl::addStacktrace(std::runtime_error("Called 'fetch' with wrong number of fields. Given " + std::to_string(fields.size()) + " fields, but it should be " + std::to_string(getColumns().size()) + " fields."));
 	}
 
 	if(Driver::getDriver().fetch(statementHandle) == false) {
