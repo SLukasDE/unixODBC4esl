@@ -126,5 +126,9 @@ bool Connection::isClosed() const {
 	return handle == SQL_NULL_HDBC;
 }
 
+void* Connection::getNativeHandle() const {
+	return const_cast<void*>(handle);
+}
+
 } /* namespace database */
 } /* namespace unixodbc4esl */

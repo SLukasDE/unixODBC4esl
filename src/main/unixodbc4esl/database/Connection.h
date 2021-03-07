@@ -44,6 +44,8 @@ public:
 	void rollback() const override;
 	bool isClosed() const override;
 
+	void* getNativeHandle() const override;
+
 private:
 	SQLHANDLE handle;
 	std::size_t defaultBufferSize;

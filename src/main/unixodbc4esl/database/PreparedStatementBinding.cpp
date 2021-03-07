@@ -191,5 +191,12 @@ esl::database::ResultSet PreparedStatementBinding::execute(const std::vector<esl
 void PreparedStatementBinding::executeBulk(const std::vector<std::vector<esl::database::Field>>& fieldArrays) {
 }
 
+void* PreparedStatementBinding::getNativeHandle() const {
+	if(statementHandle) {
+		return statementHandle.getHandle();
+	}
+	return nullptr;
+}
+
 } /* namespace database */
 } /* namespace unixodbc4esl */
