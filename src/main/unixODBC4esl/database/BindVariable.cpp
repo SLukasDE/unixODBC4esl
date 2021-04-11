@@ -37,35 +37,7 @@ BindVariable::BindVariable(std::size_t aLength)
 		valueString = new char[capacity];
 	}
 }
-/*
-BindVariable::BindVariable(BindVariable&& other)
-: valueResultLength(other.valueResultLength),
-  length(other.length),
-  capacity(other.capacity)
-{
-	valueString = other.valueString;
 
-	other.length = 0;
-	other.capacity = 0;
-	other.valueString = nullptr;
-}
-
-BindVariable& BindVariable::operator=(BindVariable&& other) {
-	if(this != &other) {
-		valueResultLength = other.valueResultLength;
-		length = other.length;
-		capacity = other.capacity;
-		valueString = other.valueString;
-
-		other.valueResultLength = 0;
-		other.length = 0;
-		other.capacity = 0;
-		other.valueString = nullptr;
-	}
-
-	return *this;
-}
-*/
 BindVariable::~BindVariable() {
 	if(capacity > 0) {
 		delete[] valueString;

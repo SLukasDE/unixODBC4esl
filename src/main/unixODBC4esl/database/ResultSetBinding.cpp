@@ -43,7 +43,6 @@ ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std
 		switch(getColumns()[i].getType()) {
 		case esl::database::Column::Type::sqlInteger:
 		case esl::database::Column::Type::sqlSmallInt:
-			logger.trace << "resultColumn[" << i << "]: SQL_C_SBIGINT\n";
 			Driver::getDriver().bindCol(statementHandle, static_cast<SQLUSMALLINT>(i+1),
 					SQL_C_SBIGINT, static_cast<SQLPOINTER>(&resultVariables[i].valueInteger), 0, &resultVariables[i].valueResultLength);
 			break;
@@ -53,13 +52,11 @@ ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std
 		case esl::database::Column::Type::sqlDecimal:
 		case esl::database::Column::Type::sqlFloat:
 		case esl::database::Column::Type::sqlReal:
-			logger.trace << "resultColumn[" << i << "]: SQL_C_DOUBLE\n";
 			Driver::getDriver().bindCol(statementHandle, static_cast<SQLUSMALLINT>(i+1),
 					SQL_C_DOUBLE, static_cast<SQLPOINTER>(&resultVariables[i].valueDouble), 0, &resultVariables[i].valueResultLength);
 			break;
 
 		default:
-			logger.trace << "resultColumn[" << i << "]: SQL_C_CHAR\n";
 			std::size_t valueBufferSize = getColumns()[i].getBufferSize();
 
 			if(valueBufferSize == 0) {

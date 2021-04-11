@@ -169,34 +169,25 @@ esl::database::ResultSet PreparedStatementBinding::execute(const std::vector<esl
 				parameterVariables[i].valueString[str.size()] = 0;
 			}
 
-			logger.trace << "SQLBindParameter BEFORE\n";
 			/* ..., SQL_C_CHAR, SQL_CHAR,
 			 * parameterColumns[i]  ( with .getCharacterLength() = 255 / .getDecimalDigits() = 0)  ,
 			 * &parameterVariables[i].valueString,
 			 * 255,
 			 * &parameterVariables[i].valueResultLength = str.size();
 			 */
-			logger.trace << "  valueResultLength    = " << ((int) parameterVariables[i].valueResultLength) << "\n";
-			logger.trace << "  getCharacterLength() = " << parameterColumns[i].getCharacterLength() << "\n";
-			logger.trace << "  getDecimalDigits()   = " << parameterColumns[i].getDecimalDigits() << "\n";
 			Driver::getDriver().bindParameter(statementHandle, static_cast<SQLUSMALLINT>(i+1), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,
 					parameterColumns[i],
 					static_cast<SQLPOINTER>(parameterVariables[i].valueString),
 					bufferLength+1,
 					&parameterVariables[i].valueResultLength);
-			logger.trace << "SQLBindParameter AFTER\n";
 			break;
 		}
 	}
 
 	/* ResultSetBinding makes the "execute" */
-	logger.trace << "SQLExecute BEFORE\n";
 	Driver::getDriver().execute(statementHandle);
-	logger.trace << "SQLExecute AFTER\n";
 
 	esl::database::ResultSet resultSet;
-
-	logger.trace << "resultColumns.size()=" << resultColumns.size() << "\n";
 
 	/* make a fetch, if SQL statement has result set (e.g. no INSERT, UPDATE, DELETE) */
 	if(!resultColumns.empty()) {
