@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -19,8 +19,8 @@
 #ifndef UNIXODBC4ESL_DATABASE_RESULTSETBINDING_H_
 #define UNIXODBC4ESL_DATABASE_RESULTSETBINDING_H_
 
-#include <unixodbc4esl/database/StatementHandle.h>
-#include <unixodbc4esl/database/BindVariable.h>
+#include <unixODBC4esl/database/StatementHandle.h>
+#include <unixODBC4esl/database/BindVariable.h>
 
 #include <esl/database/ResultSet.h>
 #include <esl/database/Column.h>
@@ -28,7 +28,7 @@
 
 #include <vector>
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 class Environment;
@@ -48,6 +48,6 @@ private:
 };
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */
 
 #endif /* UNIXODBC4ESL_DATABASE_RESULTSETBINDING_H_ */

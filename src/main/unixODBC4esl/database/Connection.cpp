@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,24 +16,23 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixodbc4esl/database/Connection.h>
-#include <unixodbc4esl/database/Driver.h>
-#include <unixodbc4esl/database/PreparedStatementBinding.h>
-#include <unixodbc4esl/Logger.h>
+#include <unixODBC4esl/database/Connection.h>
+#include <unixODBC4esl/database/Driver.h>
+#include <unixODBC4esl/database/PreparedStatementBinding.h>
+#include <unixODBC4esl/Logger.h>
 
 #include <esl/database/PreparedStatement.h>
 #include <esl/database/Diagnostic.h>
-#include <esl/database/Exception.h>
 #include <esl/database/exception/SqlError.h>
 #include <esl/Stacktrace.h>
 
 #include <stdexcept>
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 namespace {
-Logger logger("unixodbc4esl::database::Connection");
+Logger logger("unixODBC4esl::database::Connection");
 }
 
 Connection::Connection(const ConnectionFactory& connectionFactory, const std::string& connectionString, std::size_t aDefaultBufferSize, std::size_t aMaximumBufferSize)
@@ -51,8 +50,6 @@ Connection::Connection(const ConnectionFactory& connectionFactory, const std::st
 }
 
 Connection::~Connection() {
-	ESL__LOGGER_TRACE_THIS("call close\n");
-
 	esl::logging::Location location;
 	location.function = __func__;
 	location.file = __FILE__;
@@ -131,4 +128,4 @@ void* Connection::getNativeHandle() const {
 }
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */

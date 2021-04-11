@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,8 +16,8 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixodbc4esl/Module.h>
-#include <unixodbc4esl/database/ConnectionFactory.h>
+#include <unixODBC4esl/Module.h>
+#include <unixODBC4esl/database/ConnectionFactory.h>
 
 #include <esl/object/Interface.h>
 #include <esl/database/Interface.h>
@@ -30,7 +30,7 @@
 #include <new>         // placement new
 #include <type_traits> // aligned_storage
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 
 namespace {
 
@@ -48,10 +48,10 @@ Module::Module()
 	esl::module::Module::initialize(*this);
 
 	addInterface(std::unique_ptr<const esl::module::Interface>(new esl::object::Interface(
-			getId(), "unixodbc4esl", &database::ConnectionFactory::createObject)));
+			getId(), "unixODBC4esl", &database::ConnectionFactory::createObject)));
 
 	addInterface(std::unique_ptr<const esl::module::Interface>(new esl::database::Interface(
-			getId(), "unixodbc4esl", &database::ConnectionFactory::create)));
+			getId(), "unixODBC4esl", &database::ConnectionFactory::create)));
 }
 
 } /* anonymous namespace */
@@ -69,4 +69,4 @@ esl::module::Module& getModule() {
 	return *modulePtr;
 }
 
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */

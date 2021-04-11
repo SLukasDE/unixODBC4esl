@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,16 +16,16 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixodbc4esl/database/BindVariable.h>
-#include <unixodbc4esl/Logger.h>
+#include <unixODBC4esl/database/BindVariable.h>
+#include <unixODBC4esl/Logger.h>
 
 #include <esl/Stacktrace.h>
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 namespace {
-Logger logger("unixodbc4esl::database::BindVariable");
+Logger logger("unixODBC4esl::database::BindVariable");
 }
 
 BindVariable::BindVariable(std::size_t aLength)
@@ -37,7 +37,35 @@ BindVariable::BindVariable(std::size_t aLength)
 		valueString = new char[capacity];
 	}
 }
+/*
+BindVariable::BindVariable(BindVariable&& other)
+: valueResultLength(other.valueResultLength),
+  length(other.length),
+  capacity(other.capacity)
+{
+	valueString = other.valueString;
 
+	other.length = 0;
+	other.capacity = 0;
+	other.valueString = nullptr;
+}
+
+BindVariable& BindVariable::operator=(BindVariable&& other) {
+	if(this != &other) {
+		valueResultLength = other.valueResultLength;
+		length = other.length;
+		capacity = other.capacity;
+		valueString = other.valueString;
+
+		other.valueResultLength = 0;
+		other.length = 0;
+		other.capacity = 0;
+		other.valueString = nullptr;
+	}
+
+	return *this;
+}
+*/
 BindVariable::~BindVariable() {
 	if(capacity > 0) {
 		delete[] valueString;
@@ -78,4 +106,4 @@ void BindVariable::reset() {
 }
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */

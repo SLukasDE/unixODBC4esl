@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,9 +16,9 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixodbc4esl/database/Driver.h>
-#include <unixodbc4esl/database/Diagnostics.h>
-#include <unixodbc4esl/Logger.h>
+#include <unixODBC4esl/database/Driver.h>
+#include <unixODBC4esl/database/Diagnostics.h>
+#include <unixODBC4esl/Logger.h>
 
 #include <esl/database/exception/SqlError.h>
 #include <esl/logging/Location.h>
@@ -28,33 +28,50 @@
 #include <stdexcept>
 #include <memory>
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 namespace {
-Logger logger("unixodbc4esl::database::Driver");
+Logger logger("unixODBC4esl::database::Driver");
 
 void checkAndThrow(SQLRETURN rc, SQLSMALLINT type, SQLHANDLE handle, const char* operation) {
-    switch(rc) {
-    case SQL_INVALID_HANDLE:
-    	if(operation) {
-            throw esl::addStacktrace(std::runtime_error(std::string("invalid handle for calling ") + operation));
-    	}
-    	else {
-            throw esl::addStacktrace(std::runtime_error("invalid handle"));
-    	}
-    case SQL_SUCCESS:
-    case SQL_SUCCESS_WITH_INFO:
-    	break;
-    case SQL_ERROR:
-    default:
-    	if(operation) {
-            throw esl::addStacktrace(esl::database::exception::SqlError(Diagnostics(type, handle), rc, operation));
-    	}
-    	else {
-            throw esl::addStacktrace(esl::database::exception::SqlError(Diagnostics(type, handle), rc));
-    	}
-    }
+	switch(rc) {
+	case SQL_SUCCESS:
+		break;
+	case SQL_SUCCESS_WITH_INFO: {
+		Diagnostics diagnostics(type, handle);
+		diagnostics.dump(logger.warn);
+		break;
+	}
+	case SQL_INVALID_HANDLE: {
+		if(operation) {
+			throw esl::addStacktrace(std::runtime_error(std::string(operation) + " returned SQL_INVALID_HANDLE"));
+		}
+		else {
+			throw esl::addStacktrace(std::runtime_error("function returned SQL_INVALID_HANDLE"));
+		}
+		break;
+	}
+	case SQL_ERROR: {
+		Diagnostics diagnostics(type, handle);
+		if(operation) {
+			throw esl::addStacktrace(esl::database::exception::SqlError(diagnostics, rc, std::string(operation) + " returned SQL_ERROR"));
+		}
+		else {
+			throw esl::addStacktrace(esl::database::exception::SqlError(diagnostics, rc, "function returned SQL_ERROR"));
+		}
+		break;
+	}
+	default: {
+		Diagnostics diagnostics(type, handle);
+		if(operation) {
+			throw esl::addStacktrace(esl::database::exception::SqlError(diagnostics, rc, std::string(operation) + " returned unknown error"));
+		}
+		else {
+			throw esl::addStacktrace(esl::database::exception::SqlError(diagnostics, rc, "function returned unknown error"));
+		}
+	}
+	}
 }
 }
 
@@ -207,9 +224,14 @@ void Driver::freeHandle(const Connection& connection) const {
 }
 
 void Driver::freeHandle(const StatementHandle& statementHandle) const {
+	// TODO: Do not throw: StatementHandles seems to be closed already after fetch() returned SQL_NO_DATA
+#if 1
+	SQLFreeHandle(SQL_HANDLE_DBC, statementHandle.getHandle());
+#else
 	SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_DBC, statementHandle.getHandle());
 
 	checkAndThrow(rc, SQL_HANDLE_STMT, statementHandle.getHandle(), "SQLFreeHandle for statement handle");
+#endif
 }
 
 #if 0
@@ -259,7 +281,7 @@ void Driver::driverConnect(const Connection& connection, const std::string conne
     SQLSMALLINT cbConnStrIn = connectionString.size();
 
 	SQLRETURN rc = SQLDriverConnect(connection.getHandle(), NULL, szConnStrIn, cbConnStrIn, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
-	checkAndThrow(rc, SQL_HANDLE_DBC, connection.getHandle(), "SQLDriverConnect");
+	checkAndThrow(rc, SQL_HANDLE_DBC, connection.getHandle(), "SQLDriverConnect failed");
 
 	ESL__LOGGER_TRACE_THIS("connected\n");
 }
@@ -408,17 +430,11 @@ void Driver::describeParam(const StatementHandle& statementHandle, SQLSMALLINT i
 	resultNullable = (sqlParameterValueNullable != 0);
 }
 
-void Driver::bindParameter(const StatementHandle& statementHandle, SQLSMALLINT index,
-    SQLSMALLINT        paramType,
-    SQLSMALLINT        cType,
-    SQLSMALLINT        sqlType,
-	const esl::database::Column& column,
-    SQLPOINTER         rgbValue,
-    SQLLEN             cbValueMax,
-    SQLLEN             *pcbValue) const {
-	SQLRETURN rc = SQLBindParameter(statementHandle.getHandle(), index, paramType, cType, sqlType,
-			static_cast<SQLULEN>(column.getCharacterLength()), static_cast<SQLSMALLINT>(column.getDecimalDigits()),
-			rgbValue, cbValueMax, pcbValue);
+void Driver::bindParameter(const StatementHandle& statementHandle, SQLSMALLINT index, SQLSMALLINT ioType, SQLSMALLINT cType, SQLSMALLINT sqlType,
+	const esl::database::Column& column, SQLPOINTER valuePtr, SQLLEN bufferLength, SQLLEN* indicatorPtrOrStrLen) const {
+	SQLRETURN rc = SQLBindParameter(statementHandle.getHandle(), index, ioType, cType, sqlType,
+			static_cast<SQLULEN>(column.getCharacterLength()), /* 0 */static_cast<SQLSMALLINT>(column.getDecimalDigits()),
+			valuePtr, bufferLength, indicatorPtrOrStrLen);
 
 	switch(cType) {
 	case SQL_C_SBIGINT:
@@ -498,4 +514,4 @@ bool Driver::fetch(const StatementHandle& statementHandle) const {
 }
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */

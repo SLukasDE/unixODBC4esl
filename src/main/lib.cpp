@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,7 +16,7 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixodbc4esl/Module.h>
+#include <unixODBC4esl/Module.h>
 
 #include <esl/module/Library.h>
 #include <esl/Module.h>
@@ -25,5 +25,5 @@ extern "C" esl::module::Module* esl__module__library__getModule(const std::strin
 	if(moduleName == "esl") {
 		return &esl::getModule();
 	}
-	return &unixodbc4esl::getModule();
+	return &unixODBC4esl::getModule();
 }

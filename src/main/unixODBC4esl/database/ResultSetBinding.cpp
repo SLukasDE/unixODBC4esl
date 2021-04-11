@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,20 +16,20 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixodbc4esl/database/ResultSetBinding.h>
-#include <unixodbc4esl/database/Driver.h>
-#include <unixodbc4esl/Logger.h>
+#include <unixODBC4esl/database/ResultSetBinding.h>
+#include <unixODBC4esl/database/Driver.h>
+#include <unixODBC4esl/Logger.h>
 
 #include <esl/Stacktrace.h>
 
 #include <stdexcept>
 #include <limits>
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 namespace {
-Logger logger("unixodbc4esl::database::ResultSetBinding");
+Logger logger("unixODBC4esl::database::ResultSetBinding");
 }
 
 ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std::vector<esl::database::Column>& resultColumns/*, const std::vector<esl::database::Column>& parameterColumns, const std::vector<esl::database::Field>& parameterFields*/)
@@ -43,6 +43,7 @@ ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std
 		switch(getColumns()[i].getType()) {
 		case esl::database::Column::Type::sqlInteger:
 		case esl::database::Column::Type::sqlSmallInt:
+			logger.trace << "resultColumn[" << i << "]: SQL_C_SBIGINT\n";
 			Driver::getDriver().bindCol(statementHandle, static_cast<SQLUSMALLINT>(i+1),
 					SQL_C_SBIGINT, static_cast<SQLPOINTER>(&resultVariables[i].valueInteger), 0, &resultVariables[i].valueResultLength);
 			break;
@@ -52,11 +53,13 @@ ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std
 		case esl::database::Column::Type::sqlDecimal:
 		case esl::database::Column::Type::sqlFloat:
 		case esl::database::Column::Type::sqlReal:
+			logger.trace << "resultColumn[" << i << "]: SQL_C_DOUBLE\n";
 			Driver::getDriver().bindCol(statementHandle, static_cast<SQLUSMALLINT>(i+1),
 					SQL_C_DOUBLE, static_cast<SQLPOINTER>(&resultVariables[i].valueDouble), 0, &resultVariables[i].valueResultLength);
 			break;
 
 		default:
+			logger.trace << "resultColumn[" << i << "]: SQL_C_CHAR\n";
 			std::size_t valueBufferSize = getColumns()[i].getBufferSize();
 
 			if(valueBufferSize == 0) {
@@ -190,4 +193,4 @@ void ResultSetBinding::save(std::vector<esl::database::Field>& fields) {
 }
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */

@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -25,13 +25,17 @@
 #include <cstdint>
 #include <cstddef>
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 struct BindVariable {
 	BindVariable() = default;
+	BindVariable(BindVariable&& other) = delete;
 	BindVariable(std::size_t length);
 	~BindVariable();
+
+	BindVariable& operator=(const BindVariable&) = delete;
+	BindVariable& operator=(BindVariable&& other) = delete;
 
 	void setLenght(std::size_t length);
 	std::size_t getLength() const noexcept;
@@ -57,6 +61,6 @@ private:
 };
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */
 
 #endif /* UNIXODBC4ESL_DATABASE_BINDVARIABLE_H_ */

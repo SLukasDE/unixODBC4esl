@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,10 +16,10 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixodbc4esl/database/PreparedStatementBinding.h>
-#include <unixodbc4esl/database/Driver.h>
-#include <unixodbc4esl/database/ResultSetBinding.h>
-#include <unixodbc4esl/Logger.h>
+#include <unixODBC4esl/database/PreparedStatementBinding.h>
+#include <unixODBC4esl/database/Driver.h>
+#include <unixODBC4esl/database/ResultSetBinding.h>
+#include <unixODBC4esl/Logger.h>
 
 #include <esl/Stacktrace.h>
 
@@ -28,11 +28,11 @@
 #include <stdexcept>
 #include <memory>
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 namespace {
-Logger logger("unixodbc4esl::database::PreparedStatementBinding");
+Logger logger("unixODBC4esl::database::PreparedStatementBinding");
 }
 
 PreparedStatementBinding::PreparedStatementBinding(const Connection& aConnection, const std::string& aSql, std::size_t defaultBufferSize, std::size_t maximumBufferSize)
@@ -95,15 +95,19 @@ esl::database::ResultSet PreparedStatementBinding::execute(const std::vector<esl
 		SQLSMALLINT sqlType = Driver::columnType2SqlType(parameterColumns[i].getType());
 		SQLLEN bufferLength = 0;
 
-		logger.debug << "Bind parameter[" << i << "]\n";
+		logger.debug << "Bind column[" << i << "]\n";
 		logger.debug << "  getTypeName()        = " << parameterColumns[i].getTypeName() << "\n";
 		logger.debug << "  sqlType              = " << sqlType << "\n";
-		logger.debug << "  field.sqlType        = " << Driver::columnType2SqlType(parameterValues[i].getColumnType()) << "\n";
 		logger.debug << "  getBufferSize()      = " << parameterColumns[i].getBufferSize() << "\n";
 		logger.debug << "  getCharacterLength() = " << parameterColumns[i].getCharacterLength() << "\n";
 		logger.debug << "  getDisplayLength()   = " << parameterColumns[i].getDisplayLength() << "\n";
 		logger.debug << "  getDecimalDigits()   = " << parameterColumns[i].getDecimalDigits() << "\n";
+		logger.debug << "Bind parameter[" << i << "]\n";
+		logger.debug << "  getTypeName()        = " << parameterValues[i].getTypeName() << "\n";
+		logger.debug << "  sqlType              = " << Driver::columnType2SqlType(parameterValues[i].getColumnType()) << "\n";
+		logger.debug << "\n";
 
+		//switch(parameterValues[i].getColumnType()) {
 		switch(parameterColumns[i].getType()) {
 		case esl::database::Column::Type::sqlInteger:
 		case esl::database::Column::Type::sqlSmallInt:
@@ -154,7 +158,10 @@ esl::database::ResultSet PreparedStatementBinding::execute(const std::vector<esl
 			else {
 				std::string str = parameterValues[i].asString();
 				bufferLength = str.size();
-				parameterVariables[i].valueResultLength = bufferLength+1;
+
+				//s.o. setLenght(...) ...parameterVariables[i] = BindVariable(str.size()+1);
+				//parameterVariables[i].valueResultLength = bufferLength+1;
+				parameterVariables[i].valueResultLength = str.size();
 
 				logger.trace << "parameterVariables[" << i << "].setLenght(" << (str.size() + 1) << ")\n";
 				parameterVariables[i].setLenght(str.size() + 1);
@@ -162,20 +169,34 @@ esl::database::ResultSet PreparedStatementBinding::execute(const std::vector<esl
 				parameterVariables[i].valueString[str.size()] = 0;
 			}
 
-			Driver::getDriver().bindParameter(statementHandle, static_cast<SQLUSMALLINT>(i+1), SQL_PARAM_INPUT,
-					SQL_C_CHAR, SQL_CHAR,
+			logger.trace << "SQLBindParameter BEFORE\n";
+			/* ..., SQL_C_CHAR, SQL_CHAR,
+			 * parameterColumns[i]  ( with .getCharacterLength() = 255 / .getDecimalDigits() = 0)  ,
+			 * &parameterVariables[i].valueString,
+			 * 255,
+			 * &parameterVariables[i].valueResultLength = str.size();
+			 */
+			logger.trace << "  valueResultLength    = " << ((int) parameterVariables[i].valueResultLength) << "\n";
+			logger.trace << "  getCharacterLength() = " << parameterColumns[i].getCharacterLength() << "\n";
+			logger.trace << "  getDecimalDigits()   = " << parameterColumns[i].getDecimalDigits() << "\n";
+			Driver::getDriver().bindParameter(statementHandle, static_cast<SQLUSMALLINT>(i+1), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,
 					parameterColumns[i],
-					static_cast<SQLPOINTER>(&parameterVariables[i].valueString),
+					static_cast<SQLPOINTER>(parameterVariables[i].valueString),
 					bufferLength+1,
 					&parameterVariables[i].valueResultLength);
+			logger.trace << "SQLBindParameter AFTER\n";
 			break;
 		}
 	}
 
 	/* ResultSetBinding makes the "execute" */
+	logger.trace << "SQLExecute BEFORE\n";
 	Driver::getDriver().execute(statementHandle);
+	logger.trace << "SQLExecute AFTER\n";
 
 	esl::database::ResultSet resultSet;
+
+	logger.trace << "resultColumns.size()=" << resultColumns.size() << "\n";
 
 	/* make a fetch, if SQL statement has result set (e.g. no INSERT, UPDATE, DELETE) */
 	if(!resultColumns.empty()) {
@@ -199,4 +220,4 @@ void* PreparedStatementBinding::getNativeHandle() const {
 }
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */

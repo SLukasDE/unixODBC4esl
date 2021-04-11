@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -19,9 +19,9 @@
 #ifndef UNIXODBC4ESL_DATABASE_DRIVER_H_
 #define UNIXODBC4ESL_DATABASE_DRIVER_H_
 
-#include <unixodbc4esl/database/ConnectionFactory.h>
-#include <unixodbc4esl/database/Connection.h>
-#include <unixodbc4esl/database/StatementHandle.h>
+#include <unixODBC4esl/database/ConnectionFactory.h>
+#include <unixODBC4esl/database/Connection.h>
+#include <unixODBC4esl/database/StatementHandle.h>
 
 #include <esl/database/Column.h>
 #include <esl/database/Diagnostic.h>
@@ -30,7 +30,7 @@
 
 #include <string>
 
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 class Driver {
@@ -59,14 +59,8 @@ public:
 	void describeCol(const StatementHandle& statementHandle, SQLSMALLINT index, std::string& resultColumnName, esl::database::Column::Type& resultColumnType, std::size_t& resultCharacterLength, std::size_t& resultDecimalDigits, bool& resultNullable) const;
 	void colAttributeDisplaySize(const StatementHandle& statementHandle, SQLSMALLINT index, std::size_t& resultDisplayLength) const;
 	void describeParam(const StatementHandle& statementHandle, SQLSMALLINT index, esl::database::Column::Type& resultColumnType, std::size_t& resultCharacterLength, std::size_t& resultDecimalDigits, bool& resultNullable) const;
-	void bindParameter(const StatementHandle& statementHandle, SQLSMALLINT index,
-			SQLSMALLINT        paramType,
-			SQLSMALLINT        dataType,
-			SQLSMALLINT        sqlType,
-			const esl::database::Column& column,
-			SQLPOINTER         rgbValue,
-			SQLLEN             cbValueMax,
-			SQLLEN*            pcbValue) const;
+	void bindParameter(const StatementHandle& statementHandle, SQLSMALLINT index, SQLSMALLINT ioType, SQLSMALLINT cType, SQLSMALLINT sqlType,
+			const esl::database::Column& column, SQLPOINTER valuePtr, SQLLEN bufferLength, SQLLEN* indicatorPtrOrStrLen) const;
 	void bindCol(const StatementHandle& statementHandle, SQLSMALLINT index,
 			SQLSMALLINT       dataType,
 			SQLPOINTER        rgbValue,
@@ -83,6 +77,6 @@ public:
 };
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */
 
 #endif /* UNIXODBC4ESL_DATABASE_DRIVER_H_ */

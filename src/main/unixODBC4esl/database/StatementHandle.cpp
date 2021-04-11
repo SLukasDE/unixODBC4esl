@@ -1,13 +1,13 @@
 /*
- * This file is part of unixodbc4esl.
+ * This file is part of unixODBC4esl.
  * Copyright (C) 2021 Sven Lukas
  *
- * Unixodbc4esl is free software: you can redistribute it and/or modify
+ * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Unixodbc4esl is distributed in the hope that it will be useful,
+ * UnixODBC4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,22 +16,20 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixodbc4esl/database/StatementHandle.h>
-#include <unixodbc4esl/database/Driver.h>
-#include <unixodbc4esl/Logger.h>
+#include <unixODBC4esl/database/StatementHandle.h>
+#include <unixODBC4esl/database/Driver.h>
+#include <unixODBC4esl/Logger.h>
 
 #include <esl/database/exception/SqlError.h>
 #include <esl/Stacktrace.h>
 #include <esl/logging/Location.h>
 #include <esl/logging/Logger.h>
 
-#include <sqlext.h>
-
-namespace unixodbc4esl {
+namespace unixODBC4esl {
 namespace database {
 
 namespace {
-Logger logger("unixodbc4esl::database::PreparedHandle");
+Logger logger("unixODBC4esl::database::PreparedHandle");
 }
 
 StatementHandle::StatementHandle(StatementHandle&& other)
@@ -61,6 +59,7 @@ StatementHandle::~StatementHandle() {
 	try {
 		// free statement handle
 		Driver::getDriver().freeHandle(*this);
+		handle = SQL_NULL_HSTMT;
 	}
 	catch (const esl::database::exception::SqlError& e) {
 		ESL__LOGGER_WARN_THIS("esl::database::exception::SqlError exception occured\n");
@@ -113,4 +112,4 @@ SQLHANDLE StatementHandle::getHandle() const noexcept {
 }
 
 } /* namespace database */
-} /* namespace unixodbc4esl */
+} /* namespace unixODBC4esl */
