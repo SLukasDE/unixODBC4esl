@@ -103,6 +103,10 @@ esl::database::PreparedStatement Connection::prepare(const std::string& sql) con
 	return esl::database::PreparedStatement(std::unique_ptr<esl::database::PreparedStatement::Binding>(new PreparedStatementBinding(*this, sql, defaultBufferSize, maximumBufferSize)));
 }
 
+esl::database::ResultSet Connection::getTable(const std::string& tableName) {
+	return esl::database::ResultSet();
+}
+
 void Connection::commit() const {
 	if(!isClosed()) {
 		ESL__LOGGER_TRACE_THIS("Do commit\n");

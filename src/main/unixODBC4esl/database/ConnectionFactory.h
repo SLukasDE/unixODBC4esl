@@ -21,8 +21,6 @@
 
 #include <esl/database/Interface.h>
 #include <esl/database/Connection.h>
-#include <esl/object/Settings.h>
-#include <esl/object/Values.h>
 #include <esl/object/Interface.h>
 
 #include <sqlext.h>
@@ -33,19 +31,21 @@
 namespace unixODBC4esl {
 namespace database {
 
-class ConnectionFactory : public esl::database::Interface::ConnectionFactory, public esl::object::Settings {
+class ConnectionFactory : public esl::database::Interface::ConnectionFactory {
 public:
-	static std::unique_ptr<esl::database::Interface::ConnectionFactory> create(const esl::object::Values<std::string>& settings);
-	static std::unique_ptr<esl::object::Interface::Object> createObject();
+	static inline const char* getImplementation() {
+		return "unixODBC4esl";
+	}
 
-	ConnectionFactory(const esl::object::Values<std::string>& settings);
+	static std::unique_ptr<esl::object::Interface::Object> createObject(const esl::database::Interface::Settings& settings);
+	static std::unique_ptr<esl::database::Interface::ConnectionFactory> createConnectionFactory(const esl::database::Interface::Settings& settings);
+
+	ConnectionFactory(const esl::database::Interface::Settings& settings);
 	~ConnectionFactory();
 
 	SQLHANDLE getHandle() const;
 
 	std::unique_ptr<esl::database::Connection> createConnection() override;
-
-	void addSetting(const std::string& key, const std::string& value) override;
 
 	void setConnectionString(std::string connectionString);
 

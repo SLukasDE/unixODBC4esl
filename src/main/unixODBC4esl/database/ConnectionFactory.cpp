@@ -34,24 +34,41 @@ namespace {
 Logger logger("unixODBC4esl::database::ConnectionFactory");
 }
 
-std::unique_ptr<esl::database::Interface::ConnectionFactory> ConnectionFactory::create(const esl::object::Values<std::string>& settings) {
-	return std::unique_ptr<esl::database::Interface::ConnectionFactory>(new ConnectionFactory(settings));
-}
-
-std::unique_ptr<esl::object::Interface::Object> ConnectionFactory::createObject() {
-	esl::object::Values<std::string> settings;
+std::unique_ptr<esl::object::Interface::Object> ConnectionFactory::createObject(const esl::database::Interface::Settings& settings) {
 	return std::unique_ptr<esl::object::Interface::Object>(new ConnectionFactory(settings));
 }
 
-ConnectionFactory::ConnectionFactory(const esl::object::Values<std::string>& settings)
+std::unique_ptr<esl::database::Interface::ConnectionFactory> ConnectionFactory::createConnectionFactory(const esl::database::Interface::Settings& settings) {
+	return std::unique_ptr<esl::database::Interface::ConnectionFactory>(new ConnectionFactory(settings));
+}
+
+ConnectionFactory::ConnectionFactory(const esl::database::Interface::Settings& settings)
 : esl::database::Interface::ConnectionFactory(),
   handle(Driver::getDriver().allocHandleEnvironment())
 {
   	// switch to ODBC 3.0
   	Driver::getDriver().setEnvAttr(*this, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
 
-	for(const auto setting : settings.getValues()) {
-		addSetting(setting.first, setting.second);
+	bool hasConnectionString = false;
+
+	for(const auto& setting : settings) {
+		if(setting.first == "connectionString") {
+			connectionString = setting.second;
+			hasConnectionString = true;
+		}
+		else if(setting.first == "defaultBufferSize") {
+			defaultBufferSize = std::stoi(setting.second);
+		}
+		else if(setting.first == "maximumBufferSize") {
+			maximumBufferSize = std::stoi(setting.second);
+		}
+		else {
+			throw esl::addStacktrace(std::runtime_error("Key \"" + setting.first + "\" is unknown"));
+		}
+	}
+
+	if(hasConnectionString == false) {
+		throw esl::addStacktrace(std::runtime_error("Key \"connectionString\" is missing"));
 	}
 }
 
@@ -104,33 +121,6 @@ SQLHANDLE ConnectionFactory::getHandle() const {
 
 std::unique_ptr<esl::database::Connection> ConnectionFactory::createConnection() {
 	return std::unique_ptr<esl::database::Connection>(new Connection(*this, connectionString, defaultBufferSize, maximumBufferSize));
-}
-
-void ConnectionFactory::addSetting(const std::string& key, const std::string& value) {
-	if(key == "connectionString") {
-		setConnectionString(value);
-	}
-	else if(key == "defaultBufferSize") {
-		setDefaultBufferSize(value);
-	}
-	else if(key == "maximumBufferSize") {
-		setMaximumBufferSize(value);
-	}
-	else {
-		esl::object::Settings::addSetting(key, value);
-	}
-}
-
-void ConnectionFactory::setConnectionString(std::string aConnectionString) {
-	connectionString = std::move(aConnectionString);
-}
-
-void ConnectionFactory::setDefaultBufferSize(const std::string& defaultBufferSizeString) {
-	defaultBufferSize = std::stoi(defaultBufferSizeString);
-}
-
-void ConnectionFactory::setMaximumBufferSize(const std::string& maximumBufferSizeString) {
-	maximumBufferSize = std::stoi(maximumBufferSizeString);
 }
 
 } /* namespace database */
