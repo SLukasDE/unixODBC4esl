@@ -20,6 +20,7 @@
 #define UNIXODBC4ESL_DATABASE_RESULTSETBINDING_H_
 
 #include <unixODBC4esl/database/StatementHandle.h>
+#include <unixODBC4esl/database/BindResult.h>
 #include <unixODBC4esl/database/BindVariable.h>
 
 #include <esl/database/ResultSet.h>
@@ -44,7 +45,7 @@ public:
 
 private:
 	StatementHandle statementHandle;
-	std::vector<BindVariable> resultVariables;
+	std::vector<std::unique_ptr<BindResult>> bindResult;
 };
 
 } /* namespace database */

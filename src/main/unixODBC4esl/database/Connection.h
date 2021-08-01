@@ -29,7 +29,6 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace unixODBC4esl {
 namespace database {

@@ -39,6 +39,12 @@ void checkAndThrow(SQLRETURN rc, SQLSMALLINT type, SQLHANDLE handle, const char*
 	case SQL_SUCCESS:
 		break;
 	case SQL_SUCCESS_WITH_INFO: {
+		if(operation) {
+			logger.warn << "Function \"" << operation << "\" returned SQL_SUCCESS_WITH_INFO:\n";
+		}
+		else {
+			logger.warn << "Function returned SQL_SUCCESS_WITH_INFO:\n";
+		}
 		Diagnostics diagnostics(type, handle);
 		diagnostics.dump(logger.warn);
 		break;
@@ -451,14 +457,14 @@ void Driver::bindParameter(const StatementHandle& statementHandle, SQLSMALLINT i
 		break;
 	}
 }
-
+/*
 void Driver::bindCol(const StatementHandle& statementHandle, SQLSMALLINT index,
 		SQLSMALLINT       dataType,
-		SQLPOINTER        rgbValue,
-		SQLLEN            cbValueMax,
-		SQLLEN            *pcbValue) const {
+		SQLPOINTER        resultDataPtr,
+		SQLLEN            resultDataBufferSize,
+		SQLLEN*           resultLenthPtr) const {
 
-	SQLRETURN rc = SQLBindCol(statementHandle.getHandle(), index, dataType, rgbValue, cbValueMax, pcbValue);
+	SQLRETURN rc = SQLBindCol(statementHandle.getHandle(), index, dataType, resultDataPtr, resultDataBufferSize, resultLenthPtr);
 
 	switch(dataType) {
 	case SQL_C_SBIGINT:
@@ -474,6 +480,24 @@ void Driver::bindCol(const StatementHandle& statementHandle, SQLSMALLINT index,
 		checkAndThrow(rc, SQL_HANDLE_STMT, statementHandle.getHandle(), "SQLBindCol()");
 		break;
 	}
+}
+*/
+void Driver::bindCol(const StatementHandle& statementHandle, std::size_t index, std::int64_t& resultValue, SQLLEN& resultIndicator) const {
+	SQLRETURN rc = SQLBindCol(statementHandle.getHandle(), static_cast<SQLUSMALLINT>(index+1), SQL_C_SBIGINT, static_cast<SQLPOINTER>(&resultValue), 0, &resultIndicator);
+
+	checkAndThrow(rc, SQL_HANDLE_STMT, statementHandle.getHandle(), "SQLBindCol() with SQL_C_SBIGINT");
+}
+
+void Driver::bindCol(const StatementHandle& statementHandle, std::size_t index, double& resultValue, SQLLEN& resultIndicator) const {
+	SQLRETURN rc = SQLBindCol(statementHandle.getHandle(), static_cast<SQLUSMALLINT>(index+1), SQL_C_DOUBLE, static_cast<SQLPOINTER>(&resultValue), 0, &resultIndicator);
+
+	checkAndThrow(rc, SQL_HANDLE_STMT, statementHandle.getHandle(), "SQLBindCol() with SQL_C_DOUBLE");
+}
+
+void Driver::bindCol(const StatementHandle& statementHandle, std::size_t index, char* resultData, std::size_t resultDataLength, SQLLEN& resultIndicator) const {
+	SQLRETURN rc = SQLBindCol(statementHandle.getHandle(), static_cast<SQLUSMALLINT>(index+1), SQL_C_CHAR, static_cast<SQLPOINTER>(resultData), resultDataLength, &resultIndicator);
+
+	checkAndThrow(rc, SQL_HANDLE_STMT, statementHandle.getHandle(), "SQLBindCol() with SQL_C_CHAR");
 }
 
 void Driver::getData(const StatementHandle& statementHandle, SQLSMALLINT index,

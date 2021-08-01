@@ -16,13 +16,13 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef UNIXODBC4ESL_DATABASE_BINDVARIABLE_H_
-#define UNIXODBC4ESL_DATABASE_BINDVARIABLE_H_
+#ifndef UNIXODBC4ESL_DATABASE_BINDRESULT_H_
+#define UNIXODBC4ESL_DATABASE_BINDRESULT_H_
 
 #include <unixODBC4esl/database/StatementHandle.h>
 
-#include <esl/database/Field.h>
 #include <esl/database/Column.h>
+#include <esl/database/Field.h>
 
 #include <sqlext.h>
 
@@ -33,31 +33,41 @@
 namespace unixODBC4esl {
 namespace database {
 
-struct BindVariable {
-	BindVariable(BindVariable&& other) = delete;
-	BindVariable(const StatementHandle& statementHandle, const esl::database::Column& column, std::size_t index);
-	~BindVariable();
+class BindResult {
+public:
+	BindResult(const StatementHandle& statementHandle, const esl::database::Column& column, std::size_t index);
+	//virtual ~BindResult();
 
-	BindVariable& operator=(const BindVariable&) = delete;
-	BindVariable& operator=(BindVariable&& other) = delete;
+	BindResult(const BindResult& other) = delete;
+	BindResult(BindResult&& other) = delete;
 
-	void getField(const esl::database::Field& field);
+	BindResult& operator=(const BindResult&) = delete;
+	BindResult& operator=(BindResult&& other) = delete;
+
+	void setField(esl::database::Field& field);
 
 private:
+	std::size_t getResultDataLength() const noexcept;
+	bool isSqlNullData() const noexcept;
+	bool isSqlNoTotal() const noexcept;
+
 	const StatementHandle& statementHandle;
 	const esl::database::Column& column;
 	const std::size_t index;
 
+	static const std::size_t resultDataSize = 4096;
+
 	union {
-		char* valueString;
-		std::int64_t valueInteger;
-		double valueDouble;
+		//char* valueData;
+		char resultData[resultDataSize];
+		std::int64_t resultInteger;
+		double resultDouble;
 	};
 
-	mutable SQLLEN resultLength = 0;
+	SQLLEN resultIndicator = 0;
 };
 
 } /* namespace database */
 } /* namespace unixODBC4esl */
 
-#endif /* UNIXODBC4ESL_DATABASE_BINDVARIABLE_H_ */
+#endif /* UNIXODBC4ESL_DATABASE_BINDRESULT_H_ */

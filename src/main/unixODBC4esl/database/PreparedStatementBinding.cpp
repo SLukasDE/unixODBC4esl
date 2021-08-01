@@ -40,10 +40,12 @@ PreparedStatementBinding::PreparedStatementBinding(const Connection& aConnection
   sql(aSql),
   statementHandle(Driver::getDriver().prepare(connection, sql))
 {
-	// Get number of columns from prepared statement
-	SQLSMALLINT resultColumnsCount = Driver::getDriver().numResultCols(statementHandle);
+	// Get number of result columns from prepared statement
+	SQLSMALLINT resultColumnCount = Driver::getDriver().numResultCols(statementHandle);
 
-	for(SQLSMALLINT i=0; i<resultColumnsCount; ++i) {
+	logger.trace << "Result columns from SQL \"" << sql << "\" (" << resultColumnCount << "):\n";
+	logger.trace << "-----------------------------------------------\n";
+	for(SQLSMALLINT i=0; i<resultColumnCount; ++i) {
 		std::string resultColumnName;
 		esl::database::Column::Type resultColumnType;
 		bool resultValueNullable;
@@ -54,12 +56,90 @@ PreparedStatementBinding::PreparedStatementBinding(const Connection& aConnection
 		Driver::getDriver().describeCol(statementHandle, i+1, resultColumnName, resultColumnType, resultValueCharacterLength, resultValueDecimalDigits, resultValueNullable);
 		Driver::getDriver().colAttributeDisplaySize(statementHandle, i+1, resultValueDisplayLength);
 
+		if(logger.trace) {
+			logger.trace << "Column " << i << ":\n";
+			logger.trace << "    Name: \"" << resultColumnName << "\"\n";
+			switch(resultColumnType) {
+			case esl::database::Column::Type::sqlBoolean:
+				logger.trace << "    Type: sqlBoolean\n";
+				break;
+			case esl::database::Column::Type::sqlInteger:
+				logger.trace << "    Type: sqlInteger\n";
+				break;
+			case esl::database::Column::Type::sqlSmallInt:
+				logger.trace << "    Type: sqlSmallInt\n";
+				break;
+			case esl::database::Column::Type::sqlDouble:
+				logger.trace << "    Type: sqlDouble\n";
+				break;
+			case esl::database::Column::Type::sqlNumeric:
+				logger.trace << "    Type: sqlNumeric\n";
+				break;
+			case esl::database::Column::Type::sqlDecimal:
+				logger.trace << "    Type: sqlDecimal\n";
+				break;
+			case esl::database::Column::Type::sqlFloat:
+				logger.trace << "    Type: sqlFloat\n";
+				break;
+			case esl::database::Column::Type::sqlReal:
+				logger.trace << "    Type: sqlReal\n";
+				break;
+			case esl::database::Column::Type::sqlVarChar:
+				logger.trace << "    Type: sqlVarChar\n";
+				break;
+			case esl::database::Column::Type::sqlChar:
+				logger.trace << "    Type: sqlChar\n";
+				break;
+			case esl::database::Column::Type::sqlDateTime:
+				logger.trace << "    Type: sqlDateTime\n";
+				break;
+			case esl::database::Column::Type::sqlDate:
+				logger.trace << "    Type: sqlDate\n";
+				break;
+			case esl::database::Column::Type::sqlTime:
+				logger.trace << "    Type: sqlTime\n";
+				break;
+			case esl::database::Column::Type::sqlTimestamp:
+				logger.trace << "    Type: sqlTimestamp\n";
+				break;
+			case esl::database::Column::Type::sqlWChar:
+				logger.trace << "    Type: sqlWChar\n";
+				break;
+			case esl::database::Column::Type::sqlWVarChar:
+				logger.trace << "    Type: sqlWVarChar\n";
+				break;
+			case esl::database::Column::Type::sqlWLongVarChar:
+				logger.trace << "    Type: sqlWLongVarChar\n";
+				break;
+			default:
+				logger.trace << "    Type: sqlUnknown\n";
+				break;
+			}
+
+			if(resultValueNullable) {
+				logger.trace << "    Nullable: true\n";
+			}
+			else {
+				logger.trace << "    Nullable: false\n";
+			}
+
+			logger.trace << "    CharacterLength: " << resultValueCharacterLength << "\n";
+
+			logger.trace << "    DecimalDigits: " << resultValueDecimalDigits << "\n";
+
+			logger.trace << "    DisplayLength: " << resultValueDisplayLength << "\n";
+		}
+
 		resultColumns.emplace_back(std::move(resultColumnName), resultColumnType, resultValueNullable, defaultBufferSize, maximumBufferSize, resultValueCharacterLength, resultValueDecimalDigits, resultValueDisplayLength);
     }
+	logger.trace << "-----------------------------------------------\n\n";
 
-	SQLSMALLINT parameterColumnsCount = Driver::getDriver().numParams(statementHandle);
+	// Get number of parameters from prepared statement
+	SQLSMALLINT parameterCount = Driver::getDriver().numParams(statementHandle);
 
-	for(SQLSMALLINT i=0; i<parameterColumnsCount; ++i) {
+	logger.trace << "Parameter columns (" << parameterCount << "):\n";
+	logger.trace << "-----------------------------------------------\n";
+	for(SQLSMALLINT i=0; i<parameterCount; ++i) {
 		esl::database::Column::Type parameterColumnType;
 		std::size_t parameterValueCharacterLength;
 		std::size_t parameterValueDecimalDigits;
@@ -67,8 +147,82 @@ PreparedStatementBinding::PreparedStatementBinding(const Connection& aConnection
 
 		Driver::getDriver().describeParam(statementHandle, i+1, parameterColumnType, parameterValueCharacterLength, parameterValueDecimalDigits, parameterValueNullable);
 
+		if(logger.trace) {
+			logger.trace << "Column " << i << ":\n";
+			switch(parameterColumnType) {
+			case esl::database::Column::Type::sqlBoolean:
+				logger.trace << "    Type: sqlBoolean\n";
+				break;
+			case esl::database::Column::Type::sqlInteger:
+				logger.trace << "    Type: sqlInteger\n";
+				break;
+			case esl::database::Column::Type::sqlSmallInt:
+				logger.trace << "    Type: sqlSmallInt\n";
+				break;
+			case esl::database::Column::Type::sqlDouble:
+				logger.trace << "    Type: sqlDouble\n";
+				break;
+			case esl::database::Column::Type::sqlNumeric:
+				logger.trace << "    Type: sqlNumeric\n";
+				break;
+			case esl::database::Column::Type::sqlDecimal:
+				logger.trace << "    Type: sqlDecimal\n";
+				break;
+			case esl::database::Column::Type::sqlFloat:
+				logger.trace << "    Type: sqlFloat\n";
+				break;
+			case esl::database::Column::Type::sqlReal:
+				logger.trace << "    Type: sqlReal\n";
+				break;
+			case esl::database::Column::Type::sqlVarChar:
+				logger.trace << "    Type: sqlVarChar\n";
+				break;
+			case esl::database::Column::Type::sqlChar:
+				logger.trace << "    Type: sqlChar\n";
+				break;
+			case esl::database::Column::Type::sqlDateTime:
+				logger.trace << "    Type: sqlDateTime\n";
+				break;
+			case esl::database::Column::Type::sqlDate:
+				logger.trace << "    Type: sqlDate\n";
+				break;
+			case esl::database::Column::Type::sqlTime:
+				logger.trace << "    Type: sqlTime\n";
+				break;
+			case esl::database::Column::Type::sqlTimestamp:
+				logger.trace << "    Type: sqlTimestamp\n";
+				break;
+			case esl::database::Column::Type::sqlWChar:
+				logger.trace << "    Type: sqlWChar\n";
+				break;
+			case esl::database::Column::Type::sqlWVarChar:
+				logger.trace << "    Type: sqlWVarChar\n";
+				break;
+			case esl::database::Column::Type::sqlWLongVarChar:
+				logger.trace << "    Type: sqlWLongVarChar\n";
+				break;
+			default:
+				logger.trace << "    Type: sqlUnknown\n";
+				break;
+			}
+
+			if(parameterValueNullable) {
+				logger.trace << "    Nullable: true\n";
+			}
+			else {
+				logger.trace << "    Nullable: false\n";
+			}
+
+			logger.trace << "    CharacterLength: " << parameterValueCharacterLength << "\n";
+
+			logger.trace << "    DecimalDigits: " << parameterValueDecimalDigits << "\n";
+
+			logger.trace << "    DisplayLength: (=parameterValueCharacterLength)\n";
+		}
+
 		parameterColumns.emplace_back("", parameterColumnType, parameterValueNullable, defaultBufferSize, maximumBufferSize, parameterValueDecimalDigits, parameterValueCharacterLength, parameterValueCharacterLength);
     }
+	logger.trace << "-----------------------------------------------\n\n";
 }
 
 const std::vector<esl::database::Column>& PreparedStatementBinding::getParameterColumns() const {
@@ -89,99 +243,11 @@ esl::database::ResultSet PreparedStatementBinding::execute(const std::vector<esl
 	    throw esl::addStacktrace(std::runtime_error("Wrong number of arguments. Given " + std::to_string(parameterValues.size()) + " parameters but required " + std::to_string(parameterColumns.size()) + " parameters."));
 	}
 
-	std::vector<BindVariable> parameterVariables(parameterValues.size());
+	std::vector<std::unique_ptr<BindVariable>> parameterVariables(parameterValues.size());
 
 	for(std::size_t i=0; i<parameterValues.size(); ++i) {
-		SQLSMALLINT sqlType = Driver::columnType2SqlType(parameterColumns[i].getType());
-		SQLLEN bufferLength = 0;
-
-		logger.debug << "Bind column[" << i << "]\n";
-		logger.debug << "  getTypeName()        = " << parameterColumns[i].getTypeName() << "\n";
-		logger.debug << "  sqlType              = " << sqlType << "\n";
-		logger.debug << "  getBufferSize()      = " << parameterColumns[i].getBufferSize() << "\n";
-		logger.debug << "  getCharacterLength() = " << parameterColumns[i].getCharacterLength() << "\n";
-		logger.debug << "  getDisplayLength()   = " << parameterColumns[i].getDisplayLength() << "\n";
-		logger.debug << "  getDecimalDigits()   = " << parameterColumns[i].getDecimalDigits() << "\n";
-		logger.debug << "Bind parameter[" << i << "]\n";
-		logger.debug << "  getTypeName()        = " << parameterValues[i].getTypeName() << "\n";
-		logger.debug << "  sqlType              = " << Driver::columnType2SqlType(parameterValues[i].getColumnType()) << "\n";
-		logger.debug << "\n";
-
-		//switch(parameterValues[i].getColumnType()) {
-		switch(parameterColumns[i].getType()) {
-		case esl::database::Column::Type::sqlInteger:
-		case esl::database::Column::Type::sqlSmallInt:
-			logger.debug << "  USE field.asInteger\n";
-			if(parameterValues[i].isNull()) {
-				parameterVariables[i].valueResultLength = SQL_NULL_DATA;
-			}
-			else {
-				parameterVariables[i].valueResultLength = 0;
-				parameterVariables[i].valueInteger = parameterValues[i].asInteger();
-			}
-
-			Driver::getDriver().bindParameter(statementHandle, static_cast<SQLUSMALLINT>(i+1), SQL_PARAM_INPUT,
-					SQL_C_SBIGINT, sqlType,
-					parameterColumns[i],
-					static_cast<SQLPOINTER>(&parameterVariables[i].valueInteger),
-					bufferLength,
-					&parameterVariables[i].valueResultLength);
-			break;
-
-		case esl::database::Column::Type::sqlDouble:
-		case esl::database::Column::Type::sqlNumeric:
-		case esl::database::Column::Type::sqlDecimal:
-		case esl::database::Column::Type::sqlFloat:
-		case esl::database::Column::Type::sqlReal:
-			logger.debug << "  USE field.asDouble\n";
-			if(parameterValues[i].isNull()) {
-				parameterVariables[i].valueResultLength = SQL_NULL_DATA;
-			}
-			else {
-				parameterVariables[i].valueResultLength = 0;
-				parameterVariables[i].valueDouble = parameterValues[i].asDouble();
-			}
-
-			Driver::getDriver().bindParameter(statementHandle, static_cast<SQLUSMALLINT>(i+1), SQL_PARAM_INPUT,
-					SQL_C_DOUBLE, sqlType,
-					parameterColumns[i],
-					static_cast<SQLPOINTER>(&parameterVariables[i].valueDouble),
-					bufferLength,
-					&parameterVariables[i].valueResultLength);
-			break;
-
-		default:
-			logger.debug << "  USE field.asString\n";
-			if(parameterValues[i].isNull()) {
-				parameterVariables[i].valueResultLength = SQL_NULL_DATA;
-			}
-			else {
-				std::string str = parameterValues[i].asString();
-				bufferLength = str.size();
-
-				//s.o. setLenght(...) ...parameterVariables[i] = BindVariable(str.size()+1);
-				//parameterVariables[i].valueResultLength = bufferLength+1;
-				parameterVariables[i].valueResultLength = str.size();
-
-				logger.trace << "parameterVariables[" << i << "].setLenght(" << (str.size() + 1) << ")\n";
-				parameterVariables[i].setLenght(str.size() + 1);
-				memcpy(parameterVariables[i].valueString, str.data(), str.size());
-				parameterVariables[i].valueString[str.size()] = 0;
-			}
-
-			/* ..., SQL_C_CHAR, SQL_CHAR,
-			 * parameterColumns[i]  ( with .getCharacterLength() = 255 / .getDecimalDigits() = 0)  ,
-			 * &parameterVariables[i].valueString,
-			 * 255,
-			 * &parameterVariables[i].valueResultLength = str.size();
-			 */
-			Driver::getDriver().bindParameter(statementHandle, static_cast<SQLUSMALLINT>(i+1), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR,
-					parameterColumns[i],
-					static_cast<SQLPOINTER>(parameterVariables[i].valueString),
-					bufferLength+1,
-					&parameterVariables[i].valueResultLength);
-			break;
-		}
+		parameterVariables[i].reset(new BindVariable(statementHandle, parameterColumns[i], i));
+		parameterVariables[i]->getField(parameterValues[i]);
 	}
 
 	/* ResultSetBinding makes the "execute" */

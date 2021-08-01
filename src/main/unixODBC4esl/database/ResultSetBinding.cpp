@@ -35,44 +35,14 @@ Logger logger("unixODBC4esl::database::ResultSetBinding");
 ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std::vector<esl::database::Column>& resultColumns/*, const std::vector<esl::database::Column>& parameterColumns, const std::vector<esl::database::Field>& parameterFields*/)
 : esl::database::ResultSet::Binding(resultColumns),
   statementHandle(std::move(aStatementHandle)),
-  resultVariables(resultColumns.size())
+  bindResult(resultColumns.size())
 {
+	logger.trace << "Bind result variables\":\n";
+	logger.trace << "-----------------------------------------------\n";
 	for(std::size_t i=0; i<getColumns().size(); ++i) {
-		resultVariables[i].valueResultLength = 0;
-
-		switch(getColumns()[i].getType()) {
-		case esl::database::Column::Type::sqlInteger:
-		case esl::database::Column::Type::sqlSmallInt:
-			Driver::getDriver().bindCol(statementHandle, static_cast<SQLUSMALLINT>(i+1),
-					SQL_C_SBIGINT, static_cast<SQLPOINTER>(&resultVariables[i].valueInteger), 0, &resultVariables[i].valueResultLength);
-			break;
-
-		case esl::database::Column::Type::sqlDouble:
-		case esl::database::Column::Type::sqlNumeric:
-		case esl::database::Column::Type::sqlDecimal:
-		case esl::database::Column::Type::sqlFloat:
-		case esl::database::Column::Type::sqlReal:
-			Driver::getDriver().bindCol(statementHandle, static_cast<SQLUSMALLINT>(i+1),
-					SQL_C_DOUBLE, static_cast<SQLPOINTER>(&resultVariables[i].valueDouble), 0, &resultVariables[i].valueResultLength);
-			break;
-
-		default:
-			std::size_t valueBufferSize = getColumns()[i].getBufferSize();
-
-			if(valueBufferSize == 0) {
-				resultVariables[i].setLenght(0);
-			}
-			else {
-				resultVariables[i].setLenght(valueBufferSize+1);
-			}
-
-			SQLLEN valueInputLength = valueBufferSize+1;
-			Driver::getDriver().bindCol(statementHandle, static_cast<SQLUSMALLINT>(i+1),
-					SQL_C_CHAR, static_cast<SQLPOINTER>(resultVariables[i].valueString),
-					valueInputLength, &resultVariables[i].valueResultLength);
-			break;
-		}
+		bindResult[i].reset(new BindResult(statementHandle, getColumns()[i], i));
 	}
+	logger.trace << "-----------------------------------------------\n\n";
 }
 
 bool ResultSetBinding::fetch(std::vector<esl::database::Field>& fields) {
@@ -84,95 +54,74 @@ bool ResultSetBinding::fetch(std::vector<esl::database::Field>& fields) {
 		return false;
 	}
 
+	logger.trace << "Fetch, set fields (" << getColumns().size() << "):\n";
+	logger.trace << "-----------------------------------------------\n";
 	for(std::size_t i=0; i<getColumns().size(); ++i) {
-		/* check if column value was NULL */
-		if(resultVariables[i].valueResultLength == SQL_NULL_DATA) {
-			fields[i] = nullptr;
-			continue;
+		if(logger.trace) {
+			logger.trace << "Column " << i << ":\n";
+			logger.trace << "    Name: \"" << getColumns()[i].getName() << "\"\n";
+			switch(getColumns()[i].getType()) {
+			case esl::database::Column::Type::sqlBoolean:
+				logger.trace << "    Type: sqlBoolean\n";
+				break;
+			case esl::database::Column::Type::sqlInteger:
+				logger.trace << "    Type: sqlInteger\n";
+				break;
+			case esl::database::Column::Type::sqlSmallInt:
+				logger.trace << "    Type: sqlSmallInt\n";
+				break;
+			case esl::database::Column::Type::sqlDouble:
+				logger.trace << "    Type: sqlDouble\n";
+				break;
+			case esl::database::Column::Type::sqlNumeric:
+				logger.trace << "    Type: sqlNumeric\n";
+				break;
+			case esl::database::Column::Type::sqlDecimal:
+				logger.trace << "    Type: sqlDecimal\n";
+				break;
+			case esl::database::Column::Type::sqlFloat:
+				logger.trace << "    Type: sqlFloat\n";
+				break;
+			case esl::database::Column::Type::sqlReal:
+				logger.trace << "    Type: sqlReal\n";
+				break;
+			case esl::database::Column::Type::sqlVarChar:
+				logger.trace << "    Type: sqlVarChar\n";
+				break;
+			case esl::database::Column::Type::sqlChar:
+				logger.trace << "    Type: sqlChar\n";
+				break;
+			case esl::database::Column::Type::sqlDateTime:
+				logger.trace << "    Type: sqlDateTime\n";
+				break;
+			case esl::database::Column::Type::sqlDate:
+				logger.trace << "    Type: sqlDate\n";
+				break;
+			case esl::database::Column::Type::sqlTime:
+				logger.trace << "    Type: sqlTime\n";
+				break;
+			case esl::database::Column::Type::sqlTimestamp:
+				logger.trace << "    Type: sqlTimestamp\n";
+				break;
+			case esl::database::Column::Type::sqlWChar:
+				logger.trace << "    Type: sqlWChar\n";
+				break;
+			case esl::database::Column::Type::sqlWVarChar:
+				logger.trace << "    Type: sqlWVarChar\n";
+				break;
+			case esl::database::Column::Type::sqlWLongVarChar:
+				logger.trace << "    Type: sqlWLongVarChar\n";
+				break;
+			default:
+				logger.trace << "    Type: sqlUnknown\n";
+				break;
+			}
 		}
 
-		switch(getColumns()[i].getType()) {
-/*
-		case esl::database::Column::Type::sqlBoolean:
-			if(resultVariables[i].valueString == nullptr) {
-				throw esl::database::exception::RuntimeError("fetching boolean value failed, no space reserved.");
-			}
-			if(*resultVariables[i].valueString == '1') {
-				fields[i] = true;
-			}
-			else if(*resultVariables[i].valueString == '0') {
-				fields[i] = false;
-			}
-			else {
-				throw esl::database::exception::RuntimeError("fetching boolean value failed, invalid value.");
-			}
-			break;
-*/
-		case esl::database::Column::Type::sqlInteger:
-		case esl::database::Column::Type::sqlSmallInt:
-			logger.debug << "Set integer\n";
-			fields[i] = resultVariables[i].valueInteger;
-			logger.debug << "Set integer done\n";
-			break;
 
-		case esl::database::Column::Type::sqlDouble:
-		case esl::database::Column::Type::sqlNumeric:
-		case esl::database::Column::Type::sqlDecimal:
-		case esl::database::Column::Type::sqlFloat:
-		case esl::database::Column::Type::sqlReal:
-			logger.debug << "Set double\n";
-			fields[i] = resultVariables[i].valueDouble;
-			logger.debug << "Set double done\n";
-			break;
-
-		case esl::database::Column::Type::sqlVarChar:
-		case esl::database::Column::Type::sqlChar:
-		default:
-			/* check if we have to get data manually */
-			if(resultVariables[i].valueResultLength == SQL_NO_TOTAL
-					|| static_cast<std::size_t>(resultVariables[i].valueResultLength) > getColumns()[i].getBufferSize()) {
-				std::string stringGetData;
-				BindVariable tmpBindVariable;
-
-				if(resultVariables[i].valueResultLength == SQL_NO_TOTAL) {
-					tmpBindVariable.setLenght(getColumns()[i].getDefaultBufferSize());
-				}
-				else {
-					tmpBindVariable.setLenght(resultVariables[i].valueResultLength+1);
-				}
-
-				while(true) {
-					Driver::getDriver().getData(statementHandle, static_cast<SQLUSMALLINT>(i+1),
-							SQL_C_CHAR, tmpBindVariable.valueString,
-							tmpBindVariable.getLength(), &tmpBindVariable.valueResultLength);
-
-					if(tmpBindVariable.valueResultLength == SQL_NULL_DATA) {
-						break;
-					}
-					else if(tmpBindVariable.valueResultLength == SQL_NO_TOTAL) {
-						stringGetData += std::string(tmpBindVariable.valueString, tmpBindVariable.getLength()-1);
-						continue;
-					}
-
-					stringGetData += std::string(tmpBindVariable.valueString, tmpBindVariable.valueResultLength);
-					break;
-				}
-
-				if(tmpBindVariable.valueResultLength == SQL_NULL_DATA) {
-					logger.warn << "Automatically fetching of column \"" << getColumns()[i].getName() << "\" was SQL_NO_TOTAL but getData() got SQL_NULL_DATA result.\n";
-					fields[i] = nullptr;
-				}
-				else {
-					fields[i] = std::move(stringGetData);
-				}
-			}
-			else {
-				//resultVariables[i].valueString[getColumns()[i].getBufferSize()] = 0;
-				fields[i] = std::string(resultVariables[i].valueString, resultVariables[i].valueResultLength);
-			}
-			break;
-		}
+		bindResult[i]->setField(fields[i]);
 	}
+	logger.trace << "-----------------------------------------------\n\n";
 
 	return true;
 }

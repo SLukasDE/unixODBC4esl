@@ -26,6 +26,7 @@
 #include <esl/database/exception/SqlError.h>
 #include <esl/Stacktrace.h>
 
+#include <memory>
 #include <stdexcept>
 
 namespace unixODBC4esl {

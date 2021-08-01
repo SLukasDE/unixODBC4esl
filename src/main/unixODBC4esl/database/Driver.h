@@ -28,6 +28,7 @@
 
 #include <sqlext.h>
 
+#include <cstdint>
 #include <string>
 
 namespace unixODBC4esl {
@@ -61,11 +62,18 @@ public:
 	void describeParam(const StatementHandle& statementHandle, SQLSMALLINT index, esl::database::Column::Type& resultColumnType, std::size_t& resultCharacterLength, std::size_t& resultDecimalDigits, bool& resultNullable) const;
 	void bindParameter(const StatementHandle& statementHandle, SQLSMALLINT index, SQLSMALLINT ioType, SQLSMALLINT cType, SQLSMALLINT sqlType,
 			const esl::database::Column& column, SQLPOINTER valuePtr, SQLLEN bufferLength, SQLLEN* indicatorPtrOrStrLen) const;
-	void bindCol(const StatementHandle& statementHandle, SQLSMALLINT index,
-			SQLSMALLINT       dataType,
-			SQLPOINTER        rgbValue,
-			SQLLEN            cbValueMax,
-			SQLLEN*           pcbValue) const;
+	/*
+	void bindCol(const StatementHandle& statementHandle, SQLSMALLINT index, SQLSMALLINT dataType,
+			SQLPOINTER resultDataPtr,
+			SQLLEN resultDataBufferSize,
+			SQLLEN* resultLenthPtr) const;
+			*/
+
+	void bindCol(const StatementHandle& statementHandle, std::size_t index, std::int64_t& resultValue, SQLLEN& resultIndicator) const;
+	void bindCol(const StatementHandle& statementHandle, std::size_t index, double& resultValue, SQLLEN& resultIndicator) const;
+	void bindCol(const StatementHandle& statementHandle, std::size_t index, char* resultData, std::size_t resultDataLength, SQLLEN& resultIndicator) const;
+
+
 	void getData(const StatementHandle& statementHandle, SQLSMALLINT index,
 			SQLSMALLINT       dataType,
 			void*             dataValue,

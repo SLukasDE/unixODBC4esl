@@ -41,16 +41,14 @@ StatementHandle::StatementHandle(StatementHandle&& other)
 
 StatementHandle::StatementHandle(SQLHANDLE aHandle)
 : handle(aHandle)
-{
-}
+{ }
 
 StatementHandle::~StatementHandle() {
 	if(handle == SQL_NULL_HSTMT) {
-		logger.debug << "Close statement handle (closed already)\n";
 		return;
 	}
 
-	logger.debug << "Close statement handle\n";
+	logger.trace << "Close statement handle\n";
 
 	esl::logging::Location location;
 	location.file = __FILE__;
