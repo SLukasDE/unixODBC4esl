@@ -34,17 +34,12 @@ namespace {
 Logger logger("unixODBC4esl::database::ConnectionFactory");
 }
 
-std::unique_ptr<esl::object::Interface::Object> ConnectionFactory::createObject(const esl::database::Interface::Settings& settings) {
-	return std::unique_ptr<esl::object::Interface::Object>(new ConnectionFactory(settings));
-}
-
-std::unique_ptr<esl::database::Interface::ConnectionFactory> ConnectionFactory::createConnectionFactory(const esl::database::Interface::Settings& settings) {
+std::unique_ptr<esl::database::Interface::ConnectionFactory> ConnectionFactory::createConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings) {
 	return std::unique_ptr<esl::database::Interface::ConnectionFactory>(new ConnectionFactory(settings));
 }
 
-ConnectionFactory::ConnectionFactory(const esl::database::Interface::Settings& settings)
-: esl::database::Interface::ConnectionFactory(),
-  handle(Driver::getDriver().allocHandleEnvironment())
+ConnectionFactory::ConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings)
+: handle(Driver::getDriver().allocHandleEnvironment())
 {
   	// switch to ODBC 3.0
   	Driver::getDriver().setEnvAttr(*this, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);

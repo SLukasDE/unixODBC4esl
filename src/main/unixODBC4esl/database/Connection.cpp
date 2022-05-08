@@ -37,8 +37,7 @@ Logger logger("unixODBC4esl::database::Connection");
 }
 
 Connection::Connection(const ConnectionFactory& connectionFactory, const std::string& connectionString, std::size_t aDefaultBufferSize, std::size_t aMaximumBufferSize)
-: esl::database::Connection(),
-  handle(Driver::getDriver().allocHandleConnection(connectionFactory)),
+: handle(Driver::getDriver().allocHandleConnection(connectionFactory)),
   defaultBufferSize(aDefaultBufferSize),
   maximumBufferSize(aMaximumBufferSize)
 {

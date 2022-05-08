@@ -25,8 +25,10 @@
 
 #include <sqlext.h>
 
-#include <string>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace unixODBC4esl {
 namespace database {
@@ -37,10 +39,9 @@ public:
 		return "unixODBC4esl";
 	}
 
-	static std::unique_ptr<esl::object::Interface::Object> createObject(const esl::database::Interface::Settings& settings);
-	static std::unique_ptr<esl::database::Interface::ConnectionFactory> createConnectionFactory(const esl::database::Interface::Settings& settings);
+	static std::unique_ptr<esl::database::Interface::ConnectionFactory> createConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings);
 
-	ConnectionFactory(const esl::database::Interface::Settings& settings);
+	ConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings);
 	~ConnectionFactory();
 
 	SQLHANDLE getHandle() const;

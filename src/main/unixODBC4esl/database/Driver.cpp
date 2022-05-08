@@ -232,9 +232,9 @@ void Driver::freeHandle(const Connection& connection) const {
 void Driver::freeHandle(const StatementHandle& statementHandle) const {
 	// TODO: Do not throw: StatementHandles seems to be closed already after fetch() returned SQL_NO_DATA
 #if 1
-	SQLFreeHandle(SQL_HANDLE_DBC, statementHandle.getHandle());
+	SQLFreeHandle(SQL_HANDLE_STMT, statementHandle.getHandle());
 #else
-	SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_DBC, statementHandle.getHandle());
+	SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_STMT, statementHandle.getHandle());
 
 	checkAndThrow(rc, SQL_HANDLE_STMT, statementHandle.getHandle(), "SQLFreeHandle for statement handle");
 #endif

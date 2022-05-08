@@ -28,10 +28,6 @@ namespace unixODBC4esl {
 void Module::install(esl::module::Module& module) {
 	esl::setModule(module);
 
-	module.addInterface(esl::object::Interface::createInterface(
-			database::ConnectionFactory::getImplementation(),
-			&database::ConnectionFactory::createObject));
-
 	module.addInterface(esl::database::Interface::createInterface(
 			database::ConnectionFactory::getImplementation(),
 			&database::ConnectionFactory::createConnectionFactory));
