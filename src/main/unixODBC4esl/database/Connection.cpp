@@ -19,12 +19,13 @@
 #include <unixODBC4esl/database/Connection.h>
 #include <unixODBC4esl/database/Driver.h>
 #include <unixODBC4esl/database/PreparedStatementBinding.h>
+#include <unixODBC4esl/database/PreparedBulkStatementBinding.h>
 #include <unixODBC4esl/Logger.h>
 
 #include <esl/database/PreparedStatement.h>
 #include <esl/database/Diagnostic.h>
 #include <esl/database/exception/SqlError.h>
-#include <esl/Stacktrace.h>
+#include <esl/stacktrace/Stacktrace.h>
 
 #include <memory>
 #include <stdexcept>
@@ -34,6 +35,8 @@ namespace database {
 
 namespace {
 Logger logger("unixODBC4esl::database::Connection");
+
+std::set<std::string> implementations{{"unixODBC"}};
 }
 
 Connection::Connection(const ConnectionFactory& connectionFactory, const std::string& connectionString, std::size_t aDefaultBufferSize, std::size_t aMaximumBufferSize)
@@ -68,7 +71,7 @@ Connection::~Connection() {
 		location.line = __LINE__;
     	e.getDiagnostics().dump(logger.warn, location);
 
-		const esl::Stacktrace* stacktrace = esl::getStacktrace(e);
+		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
     	if(stacktrace) {
     		location.line = __LINE__;
     		stacktrace->dump(logger.warn, location);
@@ -81,7 +84,7 @@ Connection::~Connection() {
 		ESL__LOGGER_WARN_THIS("std::exception exception occured\n");
 		ESL__LOGGER_WARN_THIS(e.what(), "\n");
 
-		const esl::Stacktrace* stacktrace = esl::getStacktrace(e);
+		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
     	if(stacktrace) {
     		location.line = __LINE__;
     		stacktrace->dump(logger.warn, location);
@@ -103,8 +106,8 @@ esl::database::PreparedStatement Connection::prepare(const std::string& sql) con
 	return esl::database::PreparedStatement(std::unique_ptr<esl::database::PreparedStatement::Binding>(new PreparedStatementBinding(*this, sql, defaultBufferSize, maximumBufferSize)));
 }
 
-esl::database::ResultSet Connection::getTable(const std::string& tableName) {
-	return esl::database::ResultSet();
+esl::database::PreparedBulkStatement Connection::prepareBulk(const std::string& sql) const {
+	return esl::database::PreparedBulkStatement(std::unique_ptr<esl::database::PreparedBulkStatement::Binding>(new PreparedBulkStatementBinding(*this, sql, defaultBufferSize, maximumBufferSize)));
 }
 
 void Connection::commit() const {
@@ -130,6 +133,11 @@ bool Connection::isClosed() const {
 void* Connection::getNativeHandle() const {
 	return const_cast<void*>(handle);
 }
+
+const std::set<std::string>& Connection::getImplementations() const {
+	return implementations;
+}
+
 
 } /* namespace database */
 } /* namespace unixODBC4esl */

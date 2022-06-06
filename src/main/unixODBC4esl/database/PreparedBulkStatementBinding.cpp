@@ -16,10 +16,9 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixODBC4esl/database/PreparedStatementBinding.h>
+#include <unixODBC4esl/database/PreparedBulkStatementBinding.h>
 #include <unixODBC4esl/database/BindVariable.h>
 #include <unixODBC4esl/database/Driver.h>
-#include <unixODBC4esl/database/ResultSetBinding.h>
 #include <unixODBC4esl/Logger.h>
 
 #include <esl/stacktrace/Stacktrace.h>
@@ -33,107 +32,19 @@ namespace unixODBC4esl {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::PreparedStatementBinding");
+Logger logger("unixODBC4esl::database::PreparedBulkStatementBinding");
 }
 
-PreparedStatementBinding::PreparedStatementBinding(const Connection& aConnection, const std::string& aSql, std::size_t defaultBufferSize, std::size_t maximumBufferSize)
+PreparedBulkStatementBinding::PreparedBulkStatementBinding(const Connection& aConnection, const std::string& aSql, std::size_t defaultBufferSize, std::size_t maximumBufferSize)
 : connection(aConnection),
   sql(aSql),
   statementHandle(Driver::getDriver().prepare(connection, sql))
 {
 	// Get number of result columns from prepared statement
 	SQLSMALLINT resultColumnCount = Driver::getDriver().numResultCols(statementHandle);
-
-	logger.trace << "Result columns from SQL \"" << sql << "\" (" << resultColumnCount << "):\n";
-	logger.trace << "-----------------------------------------------\n";
-	for(SQLSMALLINT i=0; i<resultColumnCount; ++i) {
-		std::string resultColumnName;
-		esl::database::Column::Type resultColumnType;
-		bool resultValueNullable;
-		std::size_t resultValueCharacterLength;
-		std::size_t resultValueDecimalDigits;
-		std::size_t resultValueDisplayLength;
-
-		Driver::getDriver().describeCol(statementHandle, i+1, resultColumnName, resultColumnType, resultValueCharacterLength, resultValueDecimalDigits, resultValueNullable);
-		Driver::getDriver().colAttributeDisplaySize(statementHandle, i+1, resultValueDisplayLength);
-
-		if(logger.trace) {
-			logger.trace << "Column " << i << ":\n";
-			logger.trace << "    Name: \"" << resultColumnName << "\"\n";
-			switch(resultColumnType) {
-			case esl::database::Column::Type::sqlBoolean:
-				logger.trace << "    Type: sqlBoolean\n";
-				break;
-			case esl::database::Column::Type::sqlInteger:
-				logger.trace << "    Type: sqlInteger\n";
-				break;
-			case esl::database::Column::Type::sqlSmallInt:
-				logger.trace << "    Type: sqlSmallInt\n";
-				break;
-			case esl::database::Column::Type::sqlDouble:
-				logger.trace << "    Type: sqlDouble\n";
-				break;
-			case esl::database::Column::Type::sqlNumeric:
-				logger.trace << "    Type: sqlNumeric\n";
-				break;
-			case esl::database::Column::Type::sqlDecimal:
-				logger.trace << "    Type: sqlDecimal\n";
-				break;
-			case esl::database::Column::Type::sqlFloat:
-				logger.trace << "    Type: sqlFloat\n";
-				break;
-			case esl::database::Column::Type::sqlReal:
-				logger.trace << "    Type: sqlReal\n";
-				break;
-			case esl::database::Column::Type::sqlVarChar:
-				logger.trace << "    Type: sqlVarChar\n";
-				break;
-			case esl::database::Column::Type::sqlChar:
-				logger.trace << "    Type: sqlChar\n";
-				break;
-			case esl::database::Column::Type::sqlDateTime:
-				logger.trace << "    Type: sqlDateTime\n";
-				break;
-			case esl::database::Column::Type::sqlDate:
-				logger.trace << "    Type: sqlDate\n";
-				break;
-			case esl::database::Column::Type::sqlTime:
-				logger.trace << "    Type: sqlTime\n";
-				break;
-			case esl::database::Column::Type::sqlTimestamp:
-				logger.trace << "    Type: sqlTimestamp\n";
-				break;
-			case esl::database::Column::Type::sqlWChar:
-				logger.trace << "    Type: sqlWChar\n";
-				break;
-			case esl::database::Column::Type::sqlWVarChar:
-				logger.trace << "    Type: sqlWVarChar\n";
-				break;
-			case esl::database::Column::Type::sqlWLongVarChar:
-				logger.trace << "    Type: sqlWLongVarChar\n";
-				break;
-			default:
-				logger.trace << "    Type: sqlUnknown\n";
-				break;
-			}
-
-			if(resultValueNullable) {
-				logger.trace << "    Nullable: true\n";
-			}
-			else {
-				logger.trace << "    Nullable: false\n";
-			}
-
-			logger.trace << "    CharacterLength: " << resultValueCharacterLength << "\n";
-
-			logger.trace << "    DecimalDigits: " << resultValueDecimalDigits << "\n";
-
-			logger.trace << "    DisplayLength: " << resultValueDisplayLength << "\n";
-		}
-
-		resultColumns.emplace_back(std::move(resultColumnName), resultColumnType, resultValueNullable, defaultBufferSize, maximumBufferSize, resultValueCharacterLength, resultValueDecimalDigits, resultValueDisplayLength);
-    }
-	logger.trace << "-----------------------------------------------\n\n";
+	if(resultColumnCount > 0) {
+	    throw esl::stacktrace::Stacktrace::add(std::runtime_error("Invalid bulk statements because it returns a result set."));
+	}
 
 	// Get number of parameters from prepared statement
 	SQLSMALLINT parameterCount = Driver::getDriver().numParams(statementHandle);
@@ -226,15 +137,11 @@ PreparedStatementBinding::PreparedStatementBinding(const Connection& aConnection
 	logger.trace << "-----------------------------------------------\n\n";
 }
 
-const std::vector<esl::database::Column>& PreparedStatementBinding::getParameterColumns() const {
+const std::vector<esl::database::Column>& PreparedBulkStatementBinding::getParameterColumns() const {
 	return parameterColumns;
 }
 
-const std::vector<esl::database::Column>& PreparedStatementBinding::getResultColumns() const {
-	return resultColumns;
-}
-
-esl::database::ResultSet PreparedStatementBinding::execute(const std::vector<esl::database::Field>& parameterValues) {
+void PreparedBulkStatementBinding::execute(const std::vector<esl::database::Field>& parameterValues) {
 	if(!statementHandle) {
 		logger.trace << "RE-Create statement handle\n";
 		statementHandle = StatementHandle(Driver::getDriver().prepare(connection, sql));
@@ -255,19 +162,9 @@ esl::database::ResultSet PreparedStatementBinding::execute(const std::vector<esl
 	Driver::getDriver().execute(statementHandle);
 
 	esl::database::ResultSet resultSet;
-
-	/* make a fetch, if SQL statement has result set (e.g. no INSERT, UPDATE, DELETE) */
-	if(!resultColumns.empty()) {
-		std::unique_ptr<esl::database::ResultSet::Binding> resultSetBinding(new ResultSetBinding(std::move(statementHandle), resultColumns));
-
-		/* this makes a fetch */
-		resultSet = esl::database::ResultSet(std::unique_ptr<esl::database::ResultSet::Binding>(std::move(resultSetBinding)));
-	}
-
-	return resultSet;
 }
 
-void* PreparedStatementBinding::getNativeHandle() const {
+void* PreparedBulkStatementBinding::getNativeHandle() const {
 	if(statementHandle) {
 		return statementHandle.getHandle();
 	}

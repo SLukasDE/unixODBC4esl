@@ -20,8 +20,6 @@
 #include <unixODBC4esl/database/Driver.h>
 #include <unixODBC4esl/Logger.h>
 
-#include <esl/Stacktrace.h>
-
 namespace unixODBC4esl {
 namespace database {
 

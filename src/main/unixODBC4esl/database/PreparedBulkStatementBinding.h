@@ -16,13 +16,13 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef UNIXODBC4ESL_DATABASE_PREPAREDSTATEMENTBINDING_H_
-#define UNIXODBC4ESL_DATABASE_PREPAREDSTATEMENTBINDING_H_
+#ifndef UNIXODBC4ESL_DATABASE_PREPAREDBULKSTATEMENTBINDING_H_
+#define UNIXODBC4ESL_DATABASE_PREPAREDBULKSTATEMENTBINDING_H_
 
 #include <unixODBC4esl/database/Connection.h>
 #include <unixODBC4esl/database/StatementHandle.h>
 
-#include <esl/database/PreparedStatement.h>
+#include <esl/database/PreparedBulkStatement.h>
 #include <esl/database/Column.h>
 #include <esl/database/Field.h>
 
@@ -32,13 +32,12 @@
 namespace unixODBC4esl {
 namespace database {
 
-class PreparedStatementBinding : public esl::database::PreparedStatement::Binding {
+class PreparedBulkStatementBinding : public esl::database::PreparedBulkStatement::Binding {
 public:
-	PreparedStatementBinding(const Connection& connection, const std::string& sql, std::size_t defaultBufferSize, std::size_t maximumBufferSize);
+	PreparedBulkStatementBinding(const Connection& connection, const std::string& sql, std::size_t defaultBufferSize, std::size_t maximumBufferSize);
 
 	const std::vector<esl::database::Column>& getParameterColumns() const override;
-	const std::vector<esl::database::Column>& getResultColumns() const override;
-	esl::database::ResultSet execute(const std::vector<esl::database::Field>& fields) override;
+	void execute(const std::vector<esl::database::Field>& fields) override;
 	void* getNativeHandle() const override;
 
 private:
@@ -46,10 +45,9 @@ private:
 	std::string sql;
 	StatementHandle statementHandle;
 	std::vector<esl::database::Column> parameterColumns;
-	std::vector<esl::database::Column> resultColumns;
 };
 
 } /* namespace database */
 } /* namespace unixODBC4esl */
 
-#endif /* UNIXODBC4ESL_DATABASE_PREPAREDSTATEMENTBINDING_H_ */
+#endif /* UNIXODBC4ESL_DATABASE_PREPAREDBULKSTATEMENTBINDING_H_ */

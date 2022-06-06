@@ -23,7 +23,7 @@
 
 #include <esl/logging/Location.h>
 #include <esl/database/exception/SqlError.h>
-#include <esl/Stacktrace.h>
+#include <esl/stacktrace/Stacktrace.h>
 
 #include <stdexcept>
 
@@ -58,12 +58,12 @@ ConnectionFactory::ConnectionFactory(const std::vector<std::pair<std::string, st
 			maximumBufferSize = std::stoi(setting.second);
 		}
 		else {
-			throw esl::addStacktrace(std::runtime_error("Key \"" + setting.first + "\" is unknown"));
+			throw esl::stacktrace::Stacktrace::add(std::runtime_error("Key \"" + setting.first + "\" is unknown"));
 		}
 	}
 
 	if(hasConnectionString == false) {
-		throw esl::addStacktrace(std::runtime_error("Key \"connectionString\" is missing"));
+		throw esl::stacktrace::Stacktrace::add(std::runtime_error("Key \"connectionString\" is missing"));
 	}
 }
 
@@ -83,7 +83,7 @@ ConnectionFactory::~ConnectionFactory() {
 		location.line = __LINE__;
     	e.getDiagnostics().dump(logger.warn, location);
 
-		const esl::Stacktrace* stacktrace = esl::getStacktrace(e);
+		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
     	if(stacktrace) {
     		location.line = __LINE__;
     		stacktrace->dump(logger.warn, location);
@@ -96,7 +96,7 @@ ConnectionFactory::~ConnectionFactory() {
 		ESL__LOGGER_WARN("std::exception exception occured\n");
 		ESL__LOGGER_WARN(e.what(), "\n");
 
-		const esl::Stacktrace* stacktrace = esl::getStacktrace(e);
+		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
     	if(stacktrace) {
     		location.line = __LINE__;
     		stacktrace->dump(logger.warn, location);

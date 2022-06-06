@@ -23,10 +23,13 @@
 
 #include <esl/database/Connection.h>
 #include <esl/database/PreparedStatement.h>
+#include <esl/database/PreparedBulkStatement.h>
 #include <esl/database/ResultSet.h>
+#include <esl/object/Implementations.h>
 
 #include <sqlext.h>
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -41,13 +44,16 @@ public:
 	SQLHANDLE getHandle() const;
 
 	esl::database::PreparedStatement prepare(const std::string& sql) const override;
-	esl::database::ResultSet getTable(const std::string& tableName);
+	esl::database::PreparedBulkStatement prepareBulk(const std::string& sql) const override;
+	//esl::database::ResultSet getTable(const std::string& tableName);
 
 	void commit() const override;
 	void rollback() const override;
 	bool isClosed() const override;
 
 	void* getNativeHandle() const override;
+
+	const std::set<std::string>& getImplementations() const override;
 
 private:
 	SQLHANDLE handle;
