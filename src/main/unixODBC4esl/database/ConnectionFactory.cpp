@@ -47,14 +47,14 @@ ConnectionFactory::ConnectionFactory(const std::vector<std::pair<std::string, st
 	bool hasConnectionString = false;
 
 	for(const auto& setting : settings) {
-		if(setting.first == "connectionString") {
+		if(setting.first == "connection-string" || setting.first == "connectionString") {
 			connectionString = setting.second;
 			hasConnectionString = true;
 		}
-		else if(setting.first == "defaultBufferSize") {
+		else if(setting.first == "default-buffer-size" || setting.first == "defaultBufferSize") {
 			defaultBufferSize = std::stoi(setting.second);
 		}
-		else if(setting.first == "maximumBufferSize") {
+		else if(setting.first == "maximum-buffer-size" || setting.first == "maximumBufferSize") {
 			maximumBufferSize = std::stoi(setting.second);
 		}
 		else {
