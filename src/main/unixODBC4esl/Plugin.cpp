@@ -16,21 +16,19 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixODBC4esl/Module.h>
+#include <unixODBC4esl/Plugin.h>
 #include <unixODBC4esl/database/ConnectionFactory.h>
 
-#include <esl/object/Interface.h>
-#include <esl/database/Interface.h>
-#include <esl/Module.h>
+#include <esl/database/ConnectionFactory.h>
 
 namespace unixODBC4esl {
 
-void Module::install(esl::module::Module& module) {
-	esl::setModule(module);
+void Plugin::install(esl::plugin::Registry& registry, const char* data) {
+	esl::plugin::Registry::set(registry);
 
-	module.addInterface(esl::database::Interface::createInterface(
-			database::ConnectionFactory::getImplementation(),
-			&database::ConnectionFactory::createConnectionFactory));
+	registry.addPlugin<esl::database::ConnectionFactory>(
+			"unixODBC4esl/database/ConnectionFactory",
+			&database::ConnectionFactory::create);
 }
 
 } /* namespace unixODBC4esl */

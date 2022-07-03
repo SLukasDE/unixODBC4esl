@@ -16,18 +16,19 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef UNIXODBC4ESL_MODULE_H_
-#define UNIXODBC4ESL_MODULE_H_
+#ifndef UNIXODBC4ESL_PLUGIN_H_
+#define UNIXODBC4ESL_PLUGIN_H_
 
-#include <esl/module/Module.h>
+#include <esl/plugin/Registry.h>
 
 namespace unixODBC4esl {
 
-struct Module final {
-	Module() = delete;
-	static void install(esl::module::Module& module);
+class Plugin final {
+public:
+	Plugin() = delete;
+	static void install(esl::plugin::Registry& registry, const char* data);
 };
 
 } /* namespace unixODBC4esl */
 
-#endif /* UNIXODBC4ESL_MODULE_H_ */
+#endif /* UNIXODBC4ESL_PLUGIN_H_ */

@@ -20,7 +20,7 @@
 #include <unixODBC4esl/database/Driver.h>
 #include <unixODBC4esl/Logger.h>
 
-#include <esl/stacktrace/Stacktrace.h>
+#include <esl/system/Stacktrace.h>
 
 namespace unixODBC4esl {
 namespace database {
@@ -180,7 +180,7 @@ void BindResult::setField(esl::database::Field& field) {
 
 		// if(getResultLength() > column.getBufferSize()) {
 		if(isSqlNoTotal()) {
-			throw esl::stacktrace::Stacktrace::add(std::runtime_error("(1) getResultLength() == SQL_NO_TOTAL"));
+			throw esl::system::Stacktrace::add(std::runtime_error("(1) getResultLength() == SQL_NO_TOTAL"));
 #if 0
 			std::string str;
 			while(true) {
@@ -253,7 +253,7 @@ void BindResult::setField(esl::database::Field& field) {
 
 			if(isSqlNullData()) {
 				//delete[] tmpBuffer;
-				throw esl::stacktrace::Stacktrace::add(std::runtime_error("Fetching of column \"" + std::to_string(index) + "\" was SQL_NO_TOTAL but getData() got SQL_NULL_DATA result."));
+				throw esl::system::Stacktrace::add(std::runtime_error("Fetching of column \"" + std::to_string(index) + "\" was SQL_NO_TOTAL but getData() got SQL_NULL_DATA result."));
 			}
 
 			std::string str(&tmpBuffer[0], tmpBufferSize);

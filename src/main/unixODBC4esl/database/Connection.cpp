@@ -25,7 +25,7 @@
 #include <esl/database/PreparedStatement.h>
 #include <esl/database/Diagnostic.h>
 #include <esl/database/exception/SqlError.h>
-#include <esl/stacktrace/Stacktrace.h>
+#include <esl/system/Stacktrace.h>
 
 #include <memory>
 #include <stdexcept>
@@ -71,7 +71,7 @@ Connection::~Connection() {
 		location.line = __LINE__;
     	e.getDiagnostics().dump(logger.warn, location);
 
-		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
+		const esl::system::Stacktrace* stacktrace = esl::system::Stacktrace::get(e);
     	if(stacktrace) {
     		location.line = __LINE__;
     		stacktrace->dump(logger.warn, location);
@@ -84,7 +84,7 @@ Connection::~Connection() {
 		ESL__LOGGER_WARN_THIS("std::exception exception occured\n");
 		ESL__LOGGER_WARN_THIS(e.what(), "\n");
 
-		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
+		const esl::system::Stacktrace* stacktrace = esl::system::Stacktrace::get(e);
     	if(stacktrace) {
     		location.line = __LINE__;
     		stacktrace->dump(logger.warn, location);

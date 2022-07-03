@@ -23,7 +23,7 @@
 
 #include <esl/logging/Location.h>
 #include <esl/database/exception/SqlError.h>
-#include <esl/stacktrace/Stacktrace.h>
+#include <esl/system/Stacktrace.h>
 
 #include <stdexcept>
 
@@ -34,8 +34,8 @@ namespace {
 Logger logger("unixODBC4esl::database::ConnectionFactory");
 }
 
-std::unique_ptr<esl::database::Interface::ConnectionFactory> ConnectionFactory::createConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings) {
-	return std::unique_ptr<esl::database::Interface::ConnectionFactory>(new ConnectionFactory(settings));
+std::unique_ptr<esl::database::ConnectionFactory> ConnectionFactory::create(const std::vector<std::pair<std::string, std::string>>& settings) {
+	return std::unique_ptr<esl::database::ConnectionFactory>(new ConnectionFactory(settings));
 }
 
 ConnectionFactory::ConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings)
@@ -58,12 +58,12 @@ ConnectionFactory::ConnectionFactory(const std::vector<std::pair<std::string, st
 			maximumBufferSize = std::stoi(setting.second);
 		}
 		else {
-			throw esl::stacktrace::Stacktrace::add(std::runtime_error("Key \"" + setting.first + "\" is unknown"));
+			throw esl::system::Stacktrace::add(std::runtime_error("Key \"" + setting.first + "\" is unknown"));
 		}
 	}
 
 	if(hasConnectionString == false) {
-		throw esl::stacktrace::Stacktrace::add(std::runtime_error("Key \"connectionString\" is missing"));
+		throw esl::system::Stacktrace::add(std::runtime_error("Key \"connectionString\" is missing"));
 	}
 }
 
@@ -83,7 +83,7 @@ ConnectionFactory::~ConnectionFactory() {
 		location.line = __LINE__;
     	e.getDiagnostics().dump(logger.warn, location);
 
-		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
+		const esl::system::Stacktrace* stacktrace = esl::system::Stacktrace::get(e);
     	if(stacktrace) {
     		location.line = __LINE__;
     		stacktrace->dump(logger.warn, location);
@@ -96,7 +96,7 @@ ConnectionFactory::~ConnectionFactory() {
 		ESL__LOGGER_WARN("std::exception exception occured\n");
 		ESL__LOGGER_WARN(e.what(), "\n");
 
-		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
+		const esl::system::Stacktrace* stacktrace = esl::system::Stacktrace::get(e);
     	if(stacktrace) {
     		location.line = __LINE__;
     		stacktrace->dump(logger.warn, location);

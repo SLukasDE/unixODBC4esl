@@ -20,7 +20,7 @@
 #include <unixODBC4esl/database/Driver.h>
 #include <unixODBC4esl/Logger.h>
 
-#include <esl/stacktrace/Stacktrace.h>
+#include <esl/system/Stacktrace.h>
 
 #include <stdexcept>
 #include <limits>
@@ -47,7 +47,7 @@ ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std
 
 bool ResultSetBinding::fetch(std::vector<esl::database::Field>& fields) {
 	if(fields.size() != getColumns().size()) {
-		throw esl::stacktrace::Stacktrace::add(std::runtime_error("Called 'fetch' with wrong number of fields. Given " + std::to_string(fields.size()) + " fields, but it should be " + std::to_string(getColumns().size()) + " fields."));
+		throw esl::system::Stacktrace::add(std::runtime_error("Called 'fetch' with wrong number of fields. Given " + std::to_string(fields.size()) + " fields, but it should be " + std::to_string(getColumns().size()) + " fields."));
 	}
 
 	if(Driver::getDriver().fetch(statementHandle) == false) {
@@ -131,11 +131,11 @@ bool ResultSetBinding::isEditable(std::size_t columnIndex) {
 }
 
 void ResultSetBinding::add(std::vector<esl::database::Field>& fields) {
-    throw esl::stacktrace::Stacktrace::add(std::runtime_error("add not allowed for query result set."));
+    throw esl::system::Stacktrace::add(std::runtime_error("add not allowed for query result set."));
 }
 
 void ResultSetBinding::save(std::vector<esl::database::Field>& fields) {
-    throw esl::stacktrace::Stacktrace::add(std::runtime_error("save not allowed for query result set."));
+    throw esl::system::Stacktrace::add(std::runtime_error("save not allowed for query result set."));
 }
 
 } /* namespace database */

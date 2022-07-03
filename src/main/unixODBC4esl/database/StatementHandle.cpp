@@ -21,7 +21,7 @@
 #include <unixODBC4esl/Logger.h>
 
 #include <esl/database/exception/SqlError.h>
-#include <esl/stacktrace/Stacktrace.h>
+#include <esl/system/Stacktrace.h>
 #include <esl/logging/Location.h>
 #include <esl/logging/Logger.h>
 
@@ -65,7 +65,7 @@ StatementHandle::~StatementHandle() {
 		location.line = __LINE__;
 		e.getDiagnostics().dump(logger.warn, location);
 
-		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
+		const esl::system::Stacktrace* stacktrace = esl::system::Stacktrace::get(e);
 		if(stacktrace) {
 			location.line = __LINE__;
 			stacktrace->dump(logger.warn, location);
@@ -78,7 +78,7 @@ StatementHandle::~StatementHandle() {
 		ESL__LOGGER_WARN_THIS("std::exception exception occured\n");
 		ESL__LOGGER_WARN_THIS(e.what(), "\n");
 
-		const esl::stacktrace::Stacktrace* stacktrace = esl::stacktrace::Stacktrace::get(e);
+		const esl::system::Stacktrace* stacktrace = esl::system::Stacktrace::get(e);
 		if(stacktrace) {
 			location.line = __LINE__;
 			stacktrace->dump(logger.warn, location);

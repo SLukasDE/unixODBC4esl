@@ -19,9 +19,9 @@
 #ifndef UNIXODBC4ESL_DATABASE_CONNECTIONFACTORY_H_
 #define UNIXODBC4ESL_DATABASE_CONNECTIONFACTORY_H_
 
-#include <esl/database/Interface.h>
+#include <esl/database/ConnectionFactory.h>
 #include <esl/database/Connection.h>
-#include <esl/object/Interface.h>
+//#include <esl/object/Interface.h>
 
 #include <sqlext.h>
 
@@ -33,13 +33,13 @@
 namespace unixODBC4esl {
 namespace database {
 
-class ConnectionFactory : public esl::database::Interface::ConnectionFactory {
+class ConnectionFactory : public esl::database::ConnectionFactory {
 public:
 	static inline const char* getImplementation() {
 		return "unixODBC4esl";
 	}
 
-	static std::unique_ptr<esl::database::Interface::ConnectionFactory> createConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings);
+	static std::unique_ptr<esl::database::ConnectionFactory> create(const std::vector<std::pair<std::string, std::string>>& settings);
 
 	ConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings);
 	~ConnectionFactory();

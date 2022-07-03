@@ -22,7 +22,7 @@
 
 #include <esl/database/exception/SqlError.h>
 #include <esl/logging/Location.h>
-#include <esl/stacktrace/Stacktrace.h>
+#include <esl/system/Stacktrace.h>
 
 #include <algorithm>
 #include <stdexcept>
@@ -51,30 +51,30 @@ void checkAndThrow(SQLRETURN rc, SQLSMALLINT type, SQLHANDLE handle, const char*
 	}
 	case SQL_INVALID_HANDLE: {
 		if(operation) {
-			throw esl::stacktrace::Stacktrace::add(std::runtime_error(std::string(operation) + " returned SQL_INVALID_HANDLE"));
+			throw esl::system::Stacktrace::add(std::runtime_error(std::string(operation) + " returned SQL_INVALID_HANDLE"));
 		}
 		else {
-			throw esl::stacktrace::Stacktrace::add(std::runtime_error("function returned SQL_INVALID_HANDLE"));
+			throw esl::system::Stacktrace::add(std::runtime_error("function returned SQL_INVALID_HANDLE"));
 		}
 		break;
 	}
 	case SQL_ERROR: {
 		Diagnostics diagnostics(type, handle);
 		if(operation) {
-			throw esl::stacktrace::Stacktrace::add(esl::database::exception::SqlError(diagnostics, rc, std::string(operation) + " returned SQL_ERROR"));
+			throw esl::system::Stacktrace::add(esl::database::exception::SqlError(diagnostics, rc, std::string(operation) + " returned SQL_ERROR"));
 		}
 		else {
-			throw esl::stacktrace::Stacktrace::add(esl::database::exception::SqlError(diagnostics, rc, "function returned SQL_ERROR"));
+			throw esl::system::Stacktrace::add(esl::database::exception::SqlError(diagnostics, rc, "function returned SQL_ERROR"));
 		}
 		break;
 	}
 	default: {
 		Diagnostics diagnostics(type, handle);
 		if(operation) {
-			throw esl::stacktrace::Stacktrace::add(esl::database::exception::SqlError(diagnostics, rc, std::string(operation) + " returned unknown error"));
+			throw esl::system::Stacktrace::add(esl::database::exception::SqlError(diagnostics, rc, std::string(operation) + " returned unknown error"));
 		}
 		else {
-			throw esl::stacktrace::Stacktrace::add(esl::database::exception::SqlError(diagnostics, rc, "function returned unknown error"));
+			throw esl::system::Stacktrace::add(esl::database::exception::SqlError(diagnostics, rc, "function returned unknown error"));
 		}
 	}
 	}

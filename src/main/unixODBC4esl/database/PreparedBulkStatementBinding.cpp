@@ -21,7 +21,7 @@
 #include <unixODBC4esl/database/Driver.h>
 #include <unixODBC4esl/Logger.h>
 
-#include <esl/stacktrace/Stacktrace.h>
+#include <esl/system/Stacktrace.h>
 
 #include <sqlext.h>
 
@@ -43,7 +43,7 @@ PreparedBulkStatementBinding::PreparedBulkStatementBinding(const Connection& aCo
 	// Get number of result columns from prepared statement
 	SQLSMALLINT resultColumnCount = Driver::getDriver().numResultCols(statementHandle);
 	if(resultColumnCount > 0) {
-	    throw esl::stacktrace::Stacktrace::add(std::runtime_error("Invalid bulk statements because it returns a result set."));
+	    throw esl::system::Stacktrace::add(std::runtime_error("Invalid bulk statements because it returns a result set."));
 	}
 
 	// Get number of parameters from prepared statement
@@ -148,7 +148,7 @@ void PreparedBulkStatementBinding::execute(const std::vector<esl::database::Fiel
 	}
 
 	if(parameterColumns.size() != parameterValues.size()) {
-	    throw esl::stacktrace::Stacktrace::add(std::runtime_error("Wrong number of arguments. Given " + std::to_string(parameterValues.size()) + " parameters but required " + std::to_string(parameterColumns.size()) + " parameters."));
+	    throw esl::system::Stacktrace::add(std::runtime_error("Wrong number of arguments. Given " + std::to_string(parameterValues.size()) + " parameters but required " + std::to_string(parameterColumns.size()) + " parameters."));
 	}
 
 	std::vector<std::unique_ptr<BindVariable>> parameterVariables(parameterValues.size());

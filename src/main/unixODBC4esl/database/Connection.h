@@ -25,7 +25,7 @@
 #include <esl/database/PreparedStatement.h>
 #include <esl/database/PreparedBulkStatement.h>
 #include <esl/database/ResultSet.h>
-#include <esl/object/Implementations.h>
+//#include <esl/object/IImplementations.h>
 
 #include <sqlext.h>
 
