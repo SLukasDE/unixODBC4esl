@@ -20,6 +20,8 @@
 #include <unixODBC4esl/database/Driver.h>
 #include <unixODBC4esl/Logger.h>
 
+#include <string.h> // memcpy
+
 namespace unixODBC4esl {
 namespace database {
 
