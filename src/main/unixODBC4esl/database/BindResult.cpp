@@ -29,6 +29,8 @@ namespace {
 Logger logger("unixODBC4esl::database::BindResult");
 }
 
+constexpr std::size_t BindResult::resultDataSize;
+
 BindResult::BindResult(const StatementHandle& aStatementHandle, const esl::database::Column& aColumn, std::size_t aIndex)
 : statementHandle(aStatementHandle),
   column(aColumn),

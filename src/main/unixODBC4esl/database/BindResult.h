@@ -55,7 +55,7 @@ private:
 	const esl::database::Column& column;
 	const std::size_t index;
 
-	static const std::size_t resultDataSize = 4096;
+	static constexpr std::size_t resultDataSize = 4096;
 
 	union {
 		//char* valueData;
