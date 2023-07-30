@@ -1,6 +1,6 @@
 /*
  * This file is part of unixODBC4esl.
- * Copyright (C) 2020-2022 Sven Lukas
+ * Copyright (C) 2020-2023 Sven Lukas
  *
  * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
@@ -23,6 +23,7 @@
 #include <esl/logging/Level.h>
 
 namespace unixODBC4esl {
+inline namespace v1_6 {
 
 #ifdef UNIXODBC4ESL_LOGGING_LEVEL_DEBUG
 using Logger = esl::logging::Logger<esl::logging::Level::TRACE>;
@@ -30,6 +31,7 @@ using Logger = esl::logging::Logger<esl::logging::Level::TRACE>;
 using Logger = esl::logging::Logger<esl::logging::Level::WARN>;
 #endif
 
+} /* inline namespace v1_6 */
 } /* namespace unixODBC4esl */
 
 #endif /* UNIXODBC4ESL_LOGGER_H_ */

@@ -1,6 +1,6 @@
 /*
  * This file is part of unixODBC4esl.
- * Copyright (C) 2020-2022 Sven Lukas
+ * Copyright (C) 2020-2023 Sven Lukas
  *
  * UnixODBC4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
@@ -28,6 +28,7 @@
 #include <stdexcept>
 
 namespace unixODBC4esl {
+inline namespace v1_6 {
 namespace database {
 
 namespace {
@@ -119,4 +120,5 @@ std::unique_ptr<esl::database::Connection> ConnectionFactory::createConnection()
 }
 
 } /* namespace database */
+} /* inline namespace v1_6 */
 } /* namespace unixODBC4esl */
