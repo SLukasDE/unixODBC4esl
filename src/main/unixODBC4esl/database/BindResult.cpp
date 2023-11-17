@@ -18,7 +18,8 @@
 
 #include <unixODBC4esl/database/BindResult.h>
 #include <unixODBC4esl/database/Driver.h>
-#include <unixODBC4esl/Logger.h>
+
+#include <esl/Logger.h>
 
 #include <esl/system/Stacktrace.h>
 
@@ -27,7 +28,7 @@ inline namespace v1_6 {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::BindResult");
+esl::Logger logger("unixODBC4esl::database::BindResult");
 }
 
 constexpr std::size_t BindResult::resultDataSize;

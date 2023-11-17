@@ -18,10 +18,10 @@
 
 #include <unixODBC4esl/database/Driver.h>
 #include <unixODBC4esl/database/Diagnostics.h>
-#include <unixODBC4esl/Logger.h>
+
+#include <esl/Logger.h>
 
 #include <esl/database/exception/SqlError.h>
-#include <esl/logging/Location.h>
 #include <esl/system/Stacktrace.h>
 
 #include <algorithm>
@@ -33,7 +33,7 @@ inline namespace v1_6 {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::Driver");
+esl::Logger logger("unixODBC4esl::database::Driver");
 
 void checkAndThrow(SQLRETURN rc, SQLSMALLINT type, SQLHANDLE handle, const char* operation) {
 	switch(rc) {

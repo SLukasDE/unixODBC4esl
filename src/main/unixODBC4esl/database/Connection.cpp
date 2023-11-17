@@ -18,13 +18,15 @@
 
 #include <unixODBC4esl/database/Connection.h>
 #include <unixODBC4esl/database/Driver.h>
-#include <unixODBC4esl/database/PreparedStatementBinding.h>
 #include <unixODBC4esl/database/PreparedBulkStatementBinding.h>
-#include <unixODBC4esl/Logger.h>
+#include <unixODBC4esl/database/PreparedStatementBinding.h>
 
-#include <esl/database/PreparedStatement.h>
+#include <esl/Logger.h>
+
 #include <esl/database/Diagnostic.h>
 #include <esl/database/exception/SqlError.h>
+#include <esl/database/PreparedStatement.h>
+#include <esl/monitoring/Streams.h>
 #include <esl/system/Stacktrace.h>
 
 #include <memory>
@@ -35,26 +37,26 @@ inline namespace v1_6 {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::Connection");
+esl::Logger logger("unixODBC4esl::database::Connection");
 
 std::set<std::string> implementations{{"unixODBC"}};
 }
 
-Connection::Connection(const ConnectionFactory& connectionFactory, const std::string& connectionString, std::size_t aDefaultBufferSize, std::size_t aMaximumBufferSize)
+Connection::Connection(const ConnectionFactory& connectionFactory)
 : handle(Driver::getDriver().allocHandleConnection(connectionFactory)),
-  defaultBufferSize(aDefaultBufferSize),
-  maximumBufferSize(aMaximumBufferSize)
+  defaultBufferSize(connectionFactory.getSettings().defaultBufferSize),
+  maximumBufferSize(connectionFactory.getSettings().maximumBufferSize)
 {
 	ESL__LOGGER_TRACE_THIS("create connection\n");
 
     // disable autocommit
     Driver::getDriver().setConnectAttr(*this, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS);
 
-	Driver::getDriver().driverConnect(*this, connectionString);
+	Driver::getDriver().driverConnect(*this, connectionFactory.getSettings().connectionString);
 }
 
 Connection::~Connection() {
-	esl::logging::Location location;
+	esl::monitoring::Streams::Location location;
 	location.function = __func__;
 	location.file = __FILE__;
 

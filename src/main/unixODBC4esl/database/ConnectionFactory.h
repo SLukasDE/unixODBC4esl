@@ -19,16 +19,13 @@
 #ifndef UNIXODBC4ESL_DATABASE_CONNECTIONFACTORY_H_
 #define UNIXODBC4ESL_DATABASE_CONNECTIONFACTORY_H_
 
-#include <esl/database/ConnectionFactory.h>
 #include <esl/database/Connection.h>
-//#include <esl/object/Interface.h>
+#include <esl/database/ConnectionFactory.h>
+#include <esl/database/ODBCConnectionFactory.h>
 
 #include <sqlext.h>
 
 #include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
 namespace unixODBC4esl {
 inline namespace v1_6 {
@@ -36,34 +33,17 @@ namespace database {
 
 class ConnectionFactory : public esl::database::ConnectionFactory {
 public:
-	static inline const char* getImplementation() {
-		return "unixODBC4esl";
-	}
-
-	static std::unique_ptr<esl::database::ConnectionFactory> create(const std::vector<std::pair<std::string, std::string>>& settings);
-
-	ConnectionFactory(const std::vector<std::pair<std::string, std::string>>& settings);
+	ConnectionFactory(esl::database::ODBCConnectionFactory::Settings settings);
 	~ConnectionFactory();
 
+	const esl::database::ODBCConnectionFactory::Settings& getSettings() const noexcept;
 	SQLHANDLE getHandle() const;
 
 	std::unique_ptr<esl::database::Connection> createConnection() override;
 
-	void setConnectionString(std::string connectionString);
-
-	/* this is the buffer size for fetching values from columns if their real buffer size cannot be figured out */
-	void setDefaultBufferSize(const std::string& defaultBufferSizeString);
-
-	/* this is the maximum buffer size for fetching values if their real buffer size is bigger. A value of zero is unlimited.
-	 * Warning: don't set this value to zero because e.g. BLOB-Fields currently say they need to take 2GB */
-	void setMaximumBufferSize(const std::string& maximumBufferSizeString);
-
 private:
+	esl::database::ODBCConnectionFactory::Settings settings;
 	SQLHANDLE handle;
-
-	std::string connectionString;
-	std::size_t defaultBufferSize = 65536;
-	std::size_t maximumBufferSize = 65536;
 };
 
 } /* namespace database */

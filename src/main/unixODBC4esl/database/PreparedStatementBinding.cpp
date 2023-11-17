@@ -20,7 +20,8 @@
 #include <unixODBC4esl/database/BindVariable.h>
 #include <unixODBC4esl/database/Driver.h>
 #include <unixODBC4esl/database/ResultSetBinding.h>
-#include <unixODBC4esl/Logger.h>
+
+#include <esl/Logger.h>
 
 #include <esl/system/Stacktrace.h>
 
@@ -34,7 +35,7 @@ inline namespace v1_6 {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::PreparedStatementBinding");
+esl::Logger logger("unixODBC4esl::database::PreparedStatementBinding");
 }
 
 PreparedStatementBinding::PreparedStatementBinding(const Connection& aConnection, const std::string& aSql, std::size_t defaultBufferSize, std::size_t maximumBufferSize)

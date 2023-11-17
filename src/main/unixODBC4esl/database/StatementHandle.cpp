@@ -18,19 +18,19 @@
 
 #include <unixODBC4esl/database/StatementHandle.h>
 #include <unixODBC4esl/database/Driver.h>
-#include <unixODBC4esl/Logger.h>
+
+#include <esl/Logger.h>
 
 #include <esl/database/exception/SqlError.h>
 #include <esl/system/Stacktrace.h>
-#include <esl/logging/Location.h>
-#include <esl/logging/Logger.h>
+#include <esl/monitoring/Streams.h>
 
 namespace unixODBC4esl {
 inline namespace v1_6 {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::PreparedHandle");
+esl::Logger logger("unixODBC4esl::database::PreparedHandle");
 }
 
 StatementHandle::StatementHandle(StatementHandle&& other)
@@ -51,7 +51,7 @@ StatementHandle::~StatementHandle() {
 
 	logger.trace << "Close statement handle\n";
 
-	esl::logging::Location location;
+	esl::monitoring::Streams::Location location;
 	location.file = __FILE__;
 	location.function = __func__;
 

@@ -18,7 +18,8 @@
 
 #include <unixODBC4esl/database/BindVariable.h>
 #include <unixODBC4esl/database/Driver.h>
-#include <unixODBC4esl/Logger.h>
+
+#include <esl/Logger.h>
 
 #include <string.h> // memcpy
 
@@ -27,7 +28,7 @@ inline namespace v1_6 {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::BindVariable");
+esl::Logger logger("unixODBC4esl::database::BindVariable");
 }
 
 BindVariable::BindVariable(const StatementHandle& aStatementHandle, const esl::database::Column& aColumn, std::size_t aIndex)

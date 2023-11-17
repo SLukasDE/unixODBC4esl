@@ -18,7 +18,8 @@
 
 #include <unixODBC4esl/database/Diagnostics.h>
 #include <unixODBC4esl/database/Driver.h>
-#include <unixODBC4esl/Logger.h>
+
+#include <esl/Logger.h>
 
 #include <algorithm>
 
@@ -27,7 +28,7 @@ inline namespace v1_6 {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::Diagnostics");
+esl::Logger logger("unixODBC4esl::database::Diagnostics");
 }
 
 Diagnostics::Diagnostics(SQLSMALLINT type, SQLHANDLE handle)

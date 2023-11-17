@@ -39,7 +39,7 @@ namespace database {
 
 class Connection : public esl::database::Connection {
 public:
-	Connection(const ConnectionFactory& connectionFactory, const std::string& connectionString, std::size_t defaultBufferSize, std::size_t maximumBufferSize);
+	Connection(const ConnectionFactory& connectionFactory);
 	~Connection();
 
 	SQLHANDLE getHandle() const;

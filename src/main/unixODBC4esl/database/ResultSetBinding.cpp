@@ -18,7 +18,8 @@
 
 #include <unixODBC4esl/database/ResultSetBinding.h>
 #include <unixODBC4esl/database/Driver.h>
-#include <unixODBC4esl/Logger.h>
+
+#include <esl/Logger.h>
 
 #include <esl/system/Stacktrace.h>
 
@@ -30,7 +31,7 @@ inline namespace v1_6 {
 namespace database {
 
 namespace {
-Logger logger("unixODBC4esl::database::ResultSetBinding");
+esl::Logger logger("unixODBC4esl::database::ResultSetBinding");
 }
 
 ResultSetBinding::ResultSetBinding(StatementHandle&& aStatementHandle, const std::vector<esl::database::Column>& resultColumns/*, const std::vector<esl::database::Column>& parameterColumns, const std::vector<esl::database::Field>& parameterFields*/)
