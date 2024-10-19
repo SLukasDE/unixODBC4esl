@@ -1,74 +1,38 @@
 cmake_minimum_required(VERSION 3.23)
 
-project(unixODBC4esl VERSION 1.5.0
-            LANGUAGES CXX)
-            
-#include(FetchContent)
-#FetchContent_Declare(
-#  catch
-#  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-#  GIT_TAG        v2.13.6
-#)
-#FetchContent_MakeAvailable(catch)
+project(
+    odbc4esl
+    VERSION 1.6.0
+    LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# The compiled library code is here
-#add_subdirectory(src/main)
-# STATIC, SHARED, MODULE, INTERFACE
-add_library(unixODBC4esl STATIC
-      ./src/main/unixODBC4esl/Plugin.cpp
-      ./src/main/unixODBC4esl/database/ResultSetBinding.cpp
-      ./src/main/unixODBC4esl/database/Diagnostics.cpp
-      ./src/main/unixODBC4esl/database/ResultSetBinding.h
-      ./src/main/unixODBC4esl/database/ConnectionFactory.h
-      ./src/main/unixODBC4esl/database/PreparedStatementBinding.h
-      ./src/main/unixODBC4esl/database/PreparedBulkStatementBinding.cpp
-      ./src/main/unixODBC4esl/database/Driver.cpp
-      ./src/main/unixODBC4esl/database/BindVariable.h
-      ./src/main/unixODBC4esl/database/StatementHandle.h
-      ./src/main/unixODBC4esl/database/PreparedBulkStatementBinding.h
-      ./src/main/unixODBC4esl/database/StatementHandle.cpp
-      ./src/main/unixODBC4esl/database/Connection.h
-      ./src/main/unixODBC4esl/database/Connection.cpp
-      ./src/main/unixODBC4esl/database/ConnectionFactory.cpp
-      ./src/main/unixODBC4esl/database/BindVariable.cpp
-      ./src/main/unixODBC4esl/database/PreparedStatementBinding.cpp
-      ./src/main/unixODBC4esl/database/Diagnostics.h
-      ./src/main/unixODBC4esl/database/BindResult.cpp
-      ./src/main/unixODBC4esl/database/Driver.h
-      ./src/main/unixODBC4esl/database/BindResult.h
-      ./src/main/unixODBC4esl/Plugin.h
-      ./src/main/unixODBC4esl/Logger.h
-)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-target_include_directories(unixODBC4esl PUBLIC ./src/main)
-target_compile_features(unixODBC4esl PUBLIC cxx_std_11)
-set_property(TARGET unixODBC4esl PROPERTY POSITION_INDEPENDENT_CODE ON)
+include(Packages)
 
-find_package(esl REQUIRED)
-find_package(ODBC REQUIRED)
+option(COMPILE_UNITTESTS "Weather to compile unittests" ON)
+option(BUILD_SHARED_LIBS "Weather to compile shared libs" ON)
 
-target_link_libraries(unixODBC4esl PRIVATE esl::esl)
-target_link_libraries(unixODBC4esl PRIVATE odbc)
+if(NOT ALL_IN_ONE_ESL)
+    find_package_esl()
+    find_package_ODBC()
+endif(NOT ALL_IN_ONE_ESL)
 
-install(TARGETS unixODBC4esl
-        EXPORT unixODBC4esl-export
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-)
+add_subdirectory(src/main)
 
-install(EXPORT      unixODBC4esl-export
-        FILE        unixODBC4eslTargets.cmake
-        NAMESPACE   unixODBC4esl::
-        DESTINATION lib/cmake
-)
+if(NOT ALL_IN_ONE_ESL AND COMPILE_UNITTESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/test/main.cpp")
+    add_subdirectory(src/test)
+endif()
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/unixODBC4eslConfig.cmake
-        DESTINATION "lib/cmake"
-)
+if(NOT ALL_IN_ONE_ESL)
+    install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAME}::
+        DESTINATION lib/cmake/${PROJECT_NAME})
 
-
-
-
-# The compiled test code is here
-#add_subdirectory(src/test)
+    install(FILES "${PROJECT_NAME}Config.cmake" DESTINATION lib/cmake/${PROJECT_NAME})
+    #install(FILES "${PROJECT_NAME}Config.cmake" "${PROJECT_NAME}ConfigVersion.cmake" DESTINATION lib/cmake/${PROJECT_NAME})
+endif(NOT ALL_IN_ONE_ESL)

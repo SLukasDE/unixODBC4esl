@@ -1,13 +1,13 @@
 /*
- * This file is part of unixODBC4esl.
+ * This file is part of odbc4esl.
  * Copyright (C) 2020-2023 Sven Lukas
  *
- * UnixODBC4esl is free software: you can redistribute it and/or modify
+ * Odbc4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * UnixODBC4esl is distributed in the hope that it will be useful,
+ * Odbc4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,12 +16,12 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef UNIXODBC4ESL_DATABASE_RESULTSETBINDING_H_
-#define UNIXODBC4ESL_DATABASE_RESULTSETBINDING_H_
+#ifndef ODBC4ESL_DATABASE_RESULTSETBINDING_H_
+#define ODBC4ESL_DATABASE_RESULTSETBINDING_H_
 
-#include <unixODBC4esl/database/StatementHandle.h>
-#include <unixODBC4esl/database/BindResult.h>
-#include <unixODBC4esl/database/BindVariable.h>
+#include <odbc4esl/database/StatementHandle.h>
+#include <odbc4esl/database/BindResult.h>
+#include <odbc4esl/database/BindVariable.h>
 
 #include <esl/database/ResultSet.h>
 #include <esl/database/Column.h>
@@ -29,7 +29,7 @@
 
 #include <vector>
 
-namespace unixODBC4esl {
+namespace odbc4esl {
 inline namespace v1_6 {
 namespace database {
 
@@ -51,6 +51,6 @@ private:
 
 } /* namespace database */
 } /* inline namespace v1_6 */
-} /* namespace unixODBC4esl */
+} /* namespace odbc4esl */
 
-#endif /* UNIXODBC4ESL_DATABASE_RESULTSETBINDING_H_ */
+#endif /* ODBC4ESL_DATABASE_RESULTSETBINDING_H_ */

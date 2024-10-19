@@ -1,6 +1,6 @@
 #include <esl/database/ODBCConnectionFactory.h>
 
-#include <unixODBC4esl/database/ConnectionFactory.h>
+#include <odbc4esl/database/ConnectionFactory.h>
 
 #include <stdexcept>
 
@@ -47,7 +47,7 @@ ODBCConnectionFactory::Settings::Settings(const std::vector<std::pair<std::strin
 }
 
 ODBCConnectionFactory::ODBCConnectionFactory(const Settings& settings)
-: connectionFactory(new unixODBC4esl::database::ConnectionFactory(settings))
+: connectionFactory(new odbc4esl::database::ConnectionFactory(settings))
 { }
 
 std::unique_ptr<ConnectionFactory> ODBCConnectionFactory::create(const std::vector<std::pair<std::string, std::string>>& settings) {

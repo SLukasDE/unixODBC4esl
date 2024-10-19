@@ -1,13 +1,13 @@
 /*
- * This file is part of unixODBC4esl.
+ * This file is part of odbc4esl.
  * Copyright (C) 2020-2023 Sven Lukas
  *
- * UnixODBC4esl is free software: you can redistribute it and/or modify
+ * Odbc4esl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * UnixODBC4esl is distributed in the hope that it will be useful,
+ * Odbc4esl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser Public License for more details.
@@ -16,10 +16,10 @@
  * along with mhd4esl.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unixODBC4esl/database/Connection.h>
-#include <unixODBC4esl/database/Driver.h>
-#include <unixODBC4esl/database/PreparedBulkStatementBinding.h>
-#include <unixODBC4esl/database/PreparedStatementBinding.h>
+#include <odbc4esl/database/Connection.h>
+#include <odbc4esl/database/Driver.h>
+#include <odbc4esl/database/PreparedBulkStatementBinding.h>
+#include <odbc4esl/database/PreparedStatementBinding.h>
 
 #include <esl/Logger.h>
 
@@ -32,12 +32,12 @@
 #include <memory>
 #include <stdexcept>
 
-namespace unixODBC4esl {
+namespace odbc4esl {
 inline namespace v1_6 {
 namespace database {
 
 namespace {
-esl::Logger logger("unixODBC4esl::database::Connection");
+esl::Logger logger("odbc4esl::database::Connection");
 
 std::set<std::string> implementations{{"unixODBC"}};
 }
@@ -144,4 +144,4 @@ const std::set<std::string>& Connection::getImplementations() const {
 
 } /* namespace database */
 } /* inline namespace v1_6 */
-} /* namespace unixODBC4esl */
+} /* namespace odbc4esl */
